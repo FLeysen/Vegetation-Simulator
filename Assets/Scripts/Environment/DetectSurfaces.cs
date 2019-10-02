@@ -14,6 +14,10 @@ public class DetectSurfaces : MonoBehaviour
         _collider = GetComponent<Collider>();
     }
 
+    public float DebugCodeDeleteLater()
+    {
+        return _surfaces[0].max.y;
+    }
 
     private void OnTriggerEnter(Collider other)
     {

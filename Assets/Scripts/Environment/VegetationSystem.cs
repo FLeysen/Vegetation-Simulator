@@ -15,7 +15,28 @@ public class VegetationSystem : MonoBehaviour
     {
         GetComponent<TrackAndPassTime>().OnPassDay += OnDayPassed;
 
+        Bounds bounds = GetComponent<Collider>().bounds;
+        float maxXDiff = bounds.extents.x;
+        float maxZDiff = bounds.extents.z;
+        float yPosition = -0.2f; //GetComponent<DetectSurfaces>().DebugCodeDeleteLater();
+        Vector3 center = bounds.center;
+        center.y = yPosition;
 
+        Vector3 spawnPos = center;
+        for (int i = 0; i < _plantPrefabLength; ++i)
+        {
+            for (int j = 0; j < _seedsBeforeStart[i]; ++j)
+            {
+                spawnPos.x += Random.Range(-maxXDiff, maxXDiff);
+                spawnPos.z += Random.Range(-maxZDiff, maxZDiff);
+                Plant plant = Instantiate(_possiblePlantPrefabs[i], spawnPos, transform.rotation).GetComponentInChildren<Plant>();
+                _plants.Add(plant);
+                plant.VegetationSys = this;
+
+                spawnPos.x = center.x;
+                spawnPos.z = center.z;
+            }
+        }
     }
 
     public void DeregisterPlant(Plant plant)

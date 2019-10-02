@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface ActOnDayPassing
+public interface IActOnDayPassing
 {
     void OnDayPassed();
 }
@@ -10,7 +10,7 @@ public interface ActOnDayPassing
 public class Plant : MonoBehaviour
 {
     public VegetationSystem VegetationSys { get; set; } = null;
-    private ActOnDayPassing[] _actOnDayPassingBehaviours = null;
+    private IActOnDayPassing[] _actOnDayPassingBehaviours = null;
 
     private void OnDestroy()
     {
@@ -19,12 +19,12 @@ public class Plant : MonoBehaviour
 
     private void Start()
     {
-        _actOnDayPassingBehaviours = GetComponents<ActOnDayPassing>();
+        _actOnDayPassingBehaviours = GetComponents<IActOnDayPassing>();
     }
 
     public void OnDayPassed()
     {
-        foreach(ActOnDayPassing actingBehaviour in _actOnDayPassingBehaviours)
+        foreach(IActOnDayPassing actingBehaviour in _actOnDayPassingBehaviours)
             actingBehaviour.OnDayPassed();
     }
 }
