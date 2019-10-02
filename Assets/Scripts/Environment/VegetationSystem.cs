@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class VegetationSystem : MonoBehaviour
@@ -7,12 +6,15 @@ public class VegetationSystem : MonoBehaviour
     [SerializeField] private GameObject[] _possiblePlantPrefabs = null;
     [SerializeField] private int[] _seedsBeforeStart = null;
     private List<Plant> _plants = new List<Plant>();
+    private Grid _grid = null;
+    private Dictionary<Vector3Int, Plant> _gridOccupations = new Dictionary<Vector3Int, Plant>();
 
     private int _plantPrefabLength = 0;
     private int _seedArrayLength = 0;
 
     private void Start()
     {
+        _grid = GetComponent<Grid>();
         GetComponent<TrackAndPassTime>().OnPassDay += OnDayPassed;
 
         Bounds bounds = GetComponent<Collider>().bounds;
@@ -30,6 +32,7 @@ public class VegetationSystem : MonoBehaviour
                 spawnPos.x += Random.Range(-maxXDiff, maxXDiff);
                 spawnPos.z += Random.Range(-maxZDiff, maxZDiff);
                 Plant plant = Instantiate(_possiblePlantPrefabs[i], spawnPos, transform.rotation).GetComponentInChildren<Plant>();
+
                 _plants.Add(plant);
                 plant.VegetationSys = this;
 
@@ -39,17 +42,39 @@ public class VegetationSystem : MonoBehaviour
         }
     }
 
+    public bool AttemptOccupy(Vector3 position, Plant plant)
+    {
+        Vector3Int gridPos = _grid.WorldToCell(position);
+        if (_gridOccupations.ContainsKey(gridPos))
+        {
+            if (_gridOccupations[gridPos] != null)
+                return false;
+            else
+            {
+                _gridOccupations[gridPos] = plant;
+                return true;
+            }
+        }
+        _gridOccupations.Add(gridPos, plant);
+        return true;
+    }
+
     public void DeregisterPlant(Plant plant)
     {
         _plants.Remove(plant);
     }
 
+    public void RemoveOccupationAt(Vector3 position)
+    {
+        Vector3Int gridPos = _grid.WorldToCell(position);
+        if (_gridOccupations.ContainsKey(gridPos))
+            _gridOccupations[gridPos] = null;
+    }
+
     private void OnDayPassed()
     {
         foreach(Plant plant in _plants)
-        {
             plant.OnDayPassed();
-        }
     }
 
     private void OnValidate()

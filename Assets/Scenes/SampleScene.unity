@@ -213,10 +213,10 @@ RectTransform:
   m_Father: {fileID: 374302687}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -679.3, y: -288.60007}
-  m_SizeDelta: {x: 512.1, y: 176.4}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 121.1, y: -124.3}
+  m_SizeDelta: {x: 192.8, y: 63.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &346443133
 MonoBehaviour:
@@ -240,10 +240,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 139
+    m_FontSize: 50
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 5
     m_MaxSize: 139
     m_Alignment: 0
     m_AlignByGeometry: 0
@@ -396,8 +396,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 448.3, y: -112.20001}
-  m_SizeDelta: {x: 847.3, y: 176.4}
+  m_AnchoredPosition: {x: 176.8, y: -58.375}
+  m_SizeDelta: {x: 304.2, y: 68.75}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &485074122
 MonoBehaviour:
@@ -421,10 +421,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 139
+    m_FontSize: 50
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 5
     m_MaxSize: 139
     m_Alignment: 0
     m_AlignByGeometry: 0
@@ -646,10 +646,10 @@ RectTransform:
   m_Father: {fileID: 374302687}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 20.1, y: -288.6}
-  m_SizeDelta: {x: 886.7, y: 176.40002}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 434.09998, y: -124.3}
+  m_SizeDelta: {x: 433.09998, y: 63.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &828493905
 MonoBehaviour:
@@ -673,10 +673,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 139
+    m_FontSize: 50
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 5
     m_MaxSize: 139
     m_Alignment: 0
     m_AlignByGeometry: 0
@@ -725,10 +725,10 @@ RectTransform:
   m_Father: {fileID: 374302687}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 355.2999, y: -112.20001}
-  m_SizeDelta: {x: 886.7, y: 176.40002}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 593.2, y: -58.375}
+  m_SizeDelta: {x: 528.6, y: 68.75}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &999973219
 MonoBehaviour:
@@ -752,10 +752,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 139
+    m_FontSize: 50
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 5
     m_MaxSize: 139
     m_Alignment: 0
     m_AlignByGeometry: 0
@@ -821,6 +821,7 @@ GameObject:
   - component: {fileID: 1592667135}
   - component: {fileID: 1592667134}
   - component: {fileID: 1592667136}
+  - component: {fileID: 1592667137}
   m_Layer: 10
   m_Name: SimulationSystem
   m_TagString: Untagged
@@ -839,7 +840,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 5, y: 2, z: 5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1592667127
 MonoBehaviour:
@@ -881,7 +882,7 @@ Transform:
   m_GameObject: {fileID: 1592667125}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 5, y: 2, z: 5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
@@ -1005,3 +1006,15 @@ MonoBehaviour:
   _possiblePlantPrefabs:
   - {fileID: 2215387684197432118, guid: d0e3a993fafb1104f911de22fba6b6d2, type: 3}
   _seedsBeforeStart: 32000000
+--- !u!156049354 &1592667137
+Grid:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1592667125}
+  m_Enabled: 1
+  m_CellSize: {x: 0.75, y: 0.75, z: 0}
+  m_CellGap: {x: 0, y: 0, z: 0}
+  m_CellLayout: 1
+  m_CellSwizzle: 1
