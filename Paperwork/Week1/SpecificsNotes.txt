@@ -1,0 +1,6 @@
+Focus on actual growth progression and spreading, not extreme scientific accuracy (i.e. where leaves appear, branches etc.)
+Meant to be usable in a game (keep performance in mind)
+Environmental factors determine everything: nutrients and water in ground, temperatures, light and airflow (for spreading)
+Environment changes over time based on current plant activity (many plants with little rain => plants start dying)
+Several different plants (don't have to be predefined, can be based on factors like "amount of water needed per day", or "minimal survival temperature"...)
+Should be as dynamic as possible: let's say I want to add a river => existing plant life will start responding to that, new plant life might grow

@@ -1,0 +1,9 @@
+Allowed to use existing assets (for visualization)
+Representing different seasons within vegetation (texture/model/shader)
+Representing different stages of progression (might not work like this)
+Perhaps do keep soil within scope? Might lead to interesting results
+Ones that grow on other vegetation are highly complex, can be perhaps stretch goal
+Specific growth locations not needed before doing research
+Wind energy plant can be good to show off possibilities of framework
+Process segment also temporary
+Method and approach: add model of how to interpret

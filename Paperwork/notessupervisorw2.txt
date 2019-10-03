@@ -1,0 +1,8 @@
+mention which book p1 comes from (keep links raw in paragraphs and proper quote them later)
+model used could also have been cellular automata (mention why not)
+segment of part one that talks about the considered models can be larger, really mention the mismatches
+either move engine choice to test case or introduction, not really research
+add images to paper
+investigate trees and plants 
+possible idea: do simulation on texture itself
+when researching think about case

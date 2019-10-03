@@ -1,0 +1,16 @@
+Move some specifics to outline
+Specify how new plants are created (via framework)
+Allowing users to start from non-empty might not be a good idea
+Rules where to go, how to evolve
+Specify which parameters and how many for prototype object
+Perhaps not all types can be compiled into a single object
+Example: vines are highly complex (need a nearby tree to grow)
+Define scale: big
+The bigger the more diverse everything has to be
+Make visualization of where to go
+Factors given without research (i.e.: which factors needed to grow)
+Scope too big, aim more to specific biotope
+How long would the simulation take (5 years vs 100 years?)
+Research question may be split into subresearch
+Meet 13:00 thursday
+

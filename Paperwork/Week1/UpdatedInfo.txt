@@ -1,0 +1,23 @@
+Environment: Sci-Fi
+
+Style of flora: Inspired by No Man's Sky
+
+Scale: Bigger than a back yard, smaller than a forest. (Test case will likely be executed in 2500-10000m²)
+
+Environmental factors: It is assumed that the environment can sustain the chosen vegetation. The only element influencing vegetation growth is placement of surfaces (e.g.: some can only grow on the sides of objects)
+
+Vegetation: Some baseline fictional vegetation accounted for. 
+- Plants that are functionally the same as real life grasses (can produce flowers that spread seeds or spread through roots in/on the ground)
+- Plants that spread only through fruits
+- Plants that spread only through flowers
+- 
+
+In editor, before running: Create volume, defining which plants are allowed to grow in this area and the amount of those plants' seeds being present in the ground before simulating. Note: if there are no plants that can grow just by having a seed in the ground (i.e.: no conditions like needing another plant nearby), nothing will grow. It is also possible to have seeds enter the volume at set intervals. They come from an unknown outside area and were taken here via wind, animals...
+
+At start: The volume will check all objects inside of it, and spawn the amount of predetermined seeds spread out over the area.
+
+During running (early stage): The seeds will get a chance to grow. It is likely that most seeds will be eliminated unless the specific plant has seed with high chance of surviving. Some plants will appear.
+
+During running (mid stage): The plants that grew now get a chance to spread their seeds. More plants will grow until the area is mostly populated with plants.
+
+During running (final stage): Plants will start dying, freeing up space for others to grow. The plants that take their place will grow and eventually die, too. This cycle is repeated indefinitely.
