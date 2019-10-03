@@ -1,13 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ManualTimePassing : MonoBehaviour
 {
-    [SerializeField] private KeyCode _passSingleDayButton = KeyCode.Q;
-    [SerializeField] private KeyCode _passDayCountButton = KeyCode.W;
+    [SerializeField] private KeyCode _passSingleDayButton = KeyCode.Alpha1;
+    [SerializeField] private KeyCode _passDayCountButton = KeyCode.Alpha2;
     [SerializeField] private int _passAmount = 5;
-    [SerializeField] private KeyCode _passAltDayCountButton = KeyCode.E;
+    [SerializeField] private KeyCode _passAltDayCountButton = KeyCode.Alpha3;
     [SerializeField] private int _altPassAmount = 10;
 
     private TrackAndPassTime _time = null;

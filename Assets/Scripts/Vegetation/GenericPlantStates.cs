@@ -99,14 +99,16 @@ public class GrowingState : State
     //TODO: Remove this test segment, should respond to light etc.
     private int _daysToReachTarget = 30;
     private int _elapsedDays = 0;
-    private Vector3 _initialScale = new Vector3(1f, 0.25f, 1f);
-    private Vector3 _targetScale = new Vector3(2f, 1f, 2f);
+    private Vector3 _initialScale = new Vector3(0.1f, 0.1f, 0.1f);
+    private Vector3 _targetScaleMultiplier = new Vector3(2f, 4f, 2f);
     private GameObject _model = null;
 
     public override void Enter(MonoBehaviour origin)
     {
         _model = origin.gameObject.transform.parent.Find("GrowingModel").gameObject;
         _model.SetActive(true);
+        _initialScale = _model.transform.parent.localScale;
+        _targetScaleMultiplier = new Vector3(_initialScale.x * _targetScaleMultiplier.x, _initialScale.y * _targetScaleMultiplier.y, _initialScale.z * _targetScaleMultiplier.z);
     }
 
     public override void Exit(MonoBehaviour origin)
@@ -115,7 +117,7 @@ public class GrowingState : State
 
     public override void Update(MonoBehaviour origin)
     {
-        _model.transform.localScale = Vector3.Lerp(_initialScale, _targetScale, (float)(++_elapsedDays) / _daysToReachTarget);
+        _model.transform.parent.localScale = Vector3.Lerp(_initialScale, _targetScaleMultiplier, (float)(++_elapsedDays) / _daysToReachTarget);
     }
 }
 
