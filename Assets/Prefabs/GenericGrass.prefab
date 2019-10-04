@@ -133,8 +133,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2538ce46e6940cd449406ee98cfc14cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _dailySeedGrowthChance: 0.05
-  _averageSeedSurvivalDays: 15
+  _dailySeedGrowthChance: 0.005
+  _averageSeedSurvivalDays: 50
   _maxSeedSurvivalVariation: 5
 --- !u!1 &2215387684197432118
 GameObject:

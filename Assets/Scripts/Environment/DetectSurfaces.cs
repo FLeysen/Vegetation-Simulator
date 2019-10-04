@@ -6,30 +6,55 @@ public class DetectSurfaces : MonoBehaviour
     private List<Bounds> _surfaces = new List<Bounds>();
 
     private List<Collider> _objectsInside = new List<Collider>();
-    private Collider _collider = null;
 
-    private void Start()
+    private float CalculateSurface(Mesh mesh, Vector3 direction)
     {
-        _collider = GetComponent<Collider>();
+        direction = direction.normalized;
+        int[] triangles = mesh.triangles;
+        Vector3[] vertices = mesh.vertices;
+
+        double sum = 0.0;
+
+        for (int i = 0, length = triangles.Length; i < length; i += 3)
+        {
+            Vector3 corner = vertices[triangles[i]];
+            Vector3 a = vertices[triangles[i + 1]] - corner;
+            Vector3 b = vertices[triangles[i + 2]] - corner;
+
+            float projection = Vector3.Dot(Vector3.Cross(b, a), direction);
+            if (projection > 0f)
+                sum += projection;
+        }
+
+        return (float)(sum / 2.0);
     }
 
-    public float DebugCodeDeleteLater()
+    public Collider GetNearestSurfaceTo(Vector3 pos, float maxYDifference)
     {
-        return _surfaces[0].max.y;
+        float sqDist = 0f;
+        Bounds bounds = _surfaces[0];
+        float minDistSQ = (bounds.center - pos).sqrMagnitude;
+        int closestIdx = 0;
+
+        for (int i = 1, length = _surfaces.Count; i < length; ++i)
+        {
+            bounds = _surfaces[i];
+            bounds.extents = new Vector3(bounds.extents.x, maxYDifference, bounds.extents.z);
+            if (!bounds.Contains(pos)) continue;
+
+            sqDist = (bounds.center - pos).sqrMagnitude;
+            if (sqDist < minDistSQ)
+            {
+                closestIdx = i;
+                minDistSQ = sqDist;
+            }
+        }
+        return _objectsInside[closestIdx];
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        //Bounds ownBounds = _collider.bounds;
-        //Vector3 ownBoundsCenter = ot
-        //Bounds otherBounds = other.bounds;
-        //Vector3 otherBoundsCenter = otherBounds.center;
-        //if (otherBounds.center > )
-        //
-        //Vector3 furthestPoint = Vector3.zero;
-        //otherBounds.SqrDistance(otherBounds.center + otherBounds.extents);
-
         _objectsInside.Add(other);
-        //other.bounds.
+        _surfaces.Add(other.bounds);
     }
 }

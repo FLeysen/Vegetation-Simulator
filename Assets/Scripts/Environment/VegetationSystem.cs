@@ -14,15 +14,22 @@ public class VegetationSystem : MonoBehaviour
 
     private void Start()
     {
+        Invoke("SpawnVegetation", 0.12f);
+    }
+
+    private void SpawnVegetation()
+    {
         _grid = GetComponent<Grid>();
         GetComponent<TrackAndPassTime>().OnPassDay += OnDayPassed;
 
+        DetectSurfaces surfaces = GetComponent<DetectSurfaces>();
+
         Bounds bounds = GetComponent<Collider>().bounds;
         float maxXDiff = bounds.extents.x;
+        float maxYDiff = bounds.extents.y;
         float maxZDiff = bounds.extents.z;
-        float yPosition = -0.2f; //GetComponent<DetectSurfaces>().DebugCodeDeleteLater();
         Vector3 center = bounds.center;
-        center.y = yPosition;
+        Collider nearestObject = null;
 
         Vector3 spawnPos = center;
         for (int i = 0; i < _plantPrefabLength; ++i)
@@ -31,6 +38,9 @@ public class VegetationSystem : MonoBehaviour
             {
                 spawnPos.x += Random.Range(-maxXDiff, maxXDiff);
                 spawnPos.z += Random.Range(-maxZDiff, maxZDiff);
+                spawnPos.y += Random.Range(-maxYDiff, maxZDiff);
+                nearestObject = surfaces.GetNearestSurfaceTo(spawnPos, bounds.extents.y);
+                spawnPos.y = nearestObject.bounds.max.y;
                 Plant plant = Instantiate(_possiblePlantPrefabs[i], spawnPos, transform.rotation).GetComponentInChildren<Plant>();
 
                 _plants.Add(plant);
