@@ -1,0 +1,15 @@
+Situation
+Task
+Action
+Result
+Reflection
+
+S: My supervisor deemed the segment I wrote for the model too short / superficial.
+
+T: Rewriting it, going more into depth on why a certain model would or would not work.
+
+A: I went back to make sure I understood the systems correctly, specified what the goals of the system I want to achieve are, and compared the systems' characteristics with those specifications.
+
+R: The segment now better explains the decision of picking an agent-based model over others.
+
+R: Reaffirming grasp on the topic helped me understand my own prior decision of model better, this might be helpful for other subjects, too. Steven's suggestion of using a cellular automaton made me realise a strong way of maintaining info over what is going on inside the system and providing the agents with that info is to make use of a grid.
