@@ -8,7 +8,9 @@ public interface IActOnDayPassing
 public class Plant : MonoBehaviour
 {
     public VegetationSystem VegetationSys { get; set; } = null;
-    private IActOnDayPassing[] _actOnDayPassingBehaviours = null;
+    public float LifeForce = 1f;
+
+    private IActOnDayPassing[] _actOnDayPassingBehaviours = new IActOnDayPassing[] { };
 
     private void OnDestroy()
     {

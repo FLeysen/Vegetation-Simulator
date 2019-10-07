@@ -3,9 +3,32 @@ using UnityEngine;
 
 public class DetectSurfaces : MonoBehaviour
 {
+    private Collider _collider = null;
     private List<Bounds> _surfaces = new List<Bounds>();
-
     private List<Collider> _objectsInside = new List<Collider>();
+
+    private void Start()
+    {
+        _collider = GetComponent<Collider>();
+    }
+
+    public bool IsNearSurface(Vector3 pos, float acceptableDist)
+    {
+        for (int i = 0, length = _surfaces.Count; i < length; ++i)
+        {
+            Bounds bounds = _surfaces[i];
+            bounds.extents = new Vector3(bounds.extents.x + acceptableDist, bounds.extents.y + acceptableDist, bounds.extents.z + acceptableDist);
+            if (!bounds.Contains(pos)) continue;
+
+            return true;
+        }
+        return false;
+    }
+
+    public bool IsWithinBounds(Vector3 position)
+    {
+        return _collider.bounds.Contains(position);
+    }
 
     private float CalculateSurface(Mesh mesh, Vector3 direction)
     {
@@ -29,6 +52,7 @@ public class DetectSurfaces : MonoBehaviour
         return (float)(sum / 2.0);
     }
 
+
     public Collider GetNearestSurfaceTo(Vector3 pos, float maxYDifference)
     {
         float sqDist = 0f;
@@ -49,6 +73,7 @@ public class DetectSurfaces : MonoBehaviour
                 minDistSQ = sqDist;
             }
         }
+
         return _objectsInside[closestIdx];
     }
 

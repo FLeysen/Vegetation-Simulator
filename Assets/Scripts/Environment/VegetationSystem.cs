@@ -5,9 +5,10 @@ public class VegetationSystem : MonoBehaviour
 {
     [SerializeField] private GameObject[] _possiblePlantPrefabs = null;
     [SerializeField] private int[] _seedsBeforeStart = null;
-    private List<Plant> _plants = new List<Plant>();
+    private List<Plant> _plants = new List<Plant>() { };
     private Grid _grid = null;
     private Dictionary<Vector3Int, Plant> _gridOccupations = new Dictionary<Vector3Int, Plant>();
+    private DetectSurfaces _surfaceDetector = null;
 
     private int _plantPrefabLength = 0;
     private int _seedArrayLength = 0;
@@ -22,7 +23,7 @@ public class VegetationSystem : MonoBehaviour
         _grid = GetComponent<Grid>();
         GetComponent<TrackAndPassTime>().OnPassDay += OnDayPassed;
 
-        DetectSurfaces surfaces = GetComponent<DetectSurfaces>();
+        _surfaceDetector = GetComponent<DetectSurfaces>();
 
         Bounds bounds = GetComponent<Collider>().bounds;
         float maxXDiff = bounds.extents.x;
@@ -39,7 +40,7 @@ public class VegetationSystem : MonoBehaviour
                 spawnPos.x += Random.Range(-maxXDiff, maxXDiff);
                 spawnPos.z += Random.Range(-maxZDiff, maxZDiff);
                 spawnPos.y += Random.Range(-maxYDiff, maxZDiff);
-                nearestObject = surfaces.GetNearestSurfaceTo(spawnPos, bounds.extents.y);
+                nearestObject = _surfaceDetector.GetNearestSurfaceTo(spawnPos, bounds.extents.y);
                 spawnPos.y = nearestObject.bounds.max.y;
                 Plant plant = Instantiate(_possiblePlantPrefabs[i], spawnPos, transform.rotation).GetComponentInChildren<Plant>();
 
@@ -52,21 +53,53 @@ public class VegetationSystem : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Use this version when the new plant is allowed to take a spot inside the creator's already occupied area
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="plant"></param>
+    /// <param name="creatorPosition"></param>
+    /// <returns></returns>
+    public bool AttemptOccupy(Vector3 position, Plant plant, Vector3 creatorPosition)
+    {
+        if (_surfaceDetector.IsNearSurface(position, 0.01f))
+        {
+            Vector3Int gridPos = _grid.WorldToCell(position);
+            if (_gridOccupations.ContainsKey(gridPos))
+            {
+                if (_gridOccupations[gridPos] != null && _gridOccupations[gridPos] != plant)
+                    return false;
+                else
+                {
+                    _gridOccupations[gridPos] = plant;
+                    return true;
+                }
+            }
+            _gridOccupations.Add(gridPos, plant);
+            return true;
+        }
+        return false;
+    }
+
     public bool AttemptOccupy(Vector3 position, Plant plant)
     {
-        Vector3Int gridPos = _grid.WorldToCell(position);
-        if (_gridOccupations.ContainsKey(gridPos))
+        if (_surfaceDetector.IsWithinBounds(position))
         {
-            if (_gridOccupations[gridPos] != null)
-                return false;
-            else
+            Vector3Int gridPos = _grid.WorldToCell(position);
+            if (_gridOccupations.ContainsKey(gridPos))
             {
-                _gridOccupations[gridPos] = plant;
-                return true;
+                if (_gridOccupations[gridPos] != null)
+                    return false;
+                else
+                {
+                    _gridOccupations[gridPos] = plant;
+                    return true;
+                }
             }
+            _gridOccupations.Add(gridPos, plant);
+            return true;
         }
-        _gridOccupations.Add(gridPos, plant);
-        return true;
+        return false;
     }
 
     public void DeregisterPlant(Plant plant)
