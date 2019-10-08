@@ -50,15 +50,7 @@ public class VegetationSystem : MonoBehaviour
                 {
                     Vector3 dir = Vector3.down;
                     float wiggleRoom = 0.01f;
-
-                    if (spawnPos.y < bounds.center.y)
-                    {
-                        dir = Vector3.up;
-                        spawnPos.y -= wiggleRoom;
-                    }
-                    else
-                        spawnPos.y += wiggleRoom;
-
+                    spawnPos.y = bounds.max.y;
 
                     if (nearestObject.Raycast(new Ray(spawnPos, dir), out RaycastHit raycastHit, bounds.size.y + wiggleRoom))
                     {

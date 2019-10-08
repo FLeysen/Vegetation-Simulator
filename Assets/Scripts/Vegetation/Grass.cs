@@ -9,7 +9,6 @@ public class Grass : MonoBehaviour, IActOnDayPassing
     [SerializeField] private uint _maxSeedSurvivalVariation = 12;
     [SerializeField] private GameObject _seedModel = null;
     [SerializeField] private GameObject _leafModel = null;
-    [SerializeField] private GameObject _connectionModel = null;
 
     private List<GrassLeaf> _grassSystem = new List<GrassLeaf>();
 
@@ -20,7 +19,6 @@ public class Grass : MonoBehaviour, IActOnDayPassing
 
     public GameObject GetSeedModel() { return _seedModel; }
     public GameObject GetLeafModel() { return _leafModel; }
-    public GameObject GetConnectionModel() { return _connectionModel; }
 
     private void OnValidate()
     {
@@ -58,10 +56,10 @@ public class GrassLeaf
     public GrassLeaf(Vector3 position, float dailySeedGrowthChance, uint averageSeedSurvivalDays, uint maxSeedSurvivalVariation, Grass grass)
     {
         Position = position;
-        _obj = grass.gameObject;
+        Obj = grass.gameObject;
         GameObject model = Object.Instantiate(grass.GetSeedModel(), position, grass.transform.rotation, grass.transform);
 
-        Plant plant = _obj.GetComponent<Plant>();
+        Plant plant = Obj.GetComponent<Plant>();
 
         GrassSeedState seedState = new GrassSeedState(model, dailySeedGrowthChance, Random.Range((int)(averageSeedSurvivalDays - maxSeedSurvivalVariation), (int)(averageSeedSurvivalDays + maxSeedSurvivalVariation + 1)));
         GrassGrowingState growingState = new GrassGrowingState(this);
@@ -93,7 +91,7 @@ public class GrassLeaf
     private void Die()
     {
         //TODO: Wither animation?
-        _obj.SetActive(false);
+        Obj.SetActive(false);
     }
 
     public void Update()
@@ -107,7 +105,7 @@ public class GrassLeaf
     }
 
     public Vector3 Position { get; private set; } = Vector3.zero;
-    private GameObject _obj = null;
+    public GameObject Obj { get; set; } = null;
     private List<GrassConnection> _connections = new List<GrassConnection>();
     private StateMachine _stateMachine = null;
 }
@@ -218,6 +216,11 @@ namespace VegetationStates
         private float _chanceToSpawn = 0.01f;
         private GrassLeaf _leaf = null;
 
+        //TODO: Remove this test segment, should respond to light etc.
+        private int _daysToLive = 50;
+        private GameObject _model = null;
+
+
         private GrassFullyGrownState() { }
         public GrassFullyGrownState(GrassLeaf leaf)
         {
@@ -240,6 +243,14 @@ namespace VegetationStates
                 float randomAngle = Random.Range(0f, Mathf.PI * 2f);
                 targetPos += new Vector3(Mathf.Cos(randomAngle) * _distanceSpawned, 0f, Mathf.Sin(randomAngle) * _distanceSpawned);
                 (origin as Grass).AddGrassToSystem(targetPos, _leaf.Position);
+            }
+
+            if (--_daysToLive == 0)
+            {
+                if ((origin as Grass).LeafCount() == 1)
+                    Object.Destroy(origin.transform.parent.gameObject);
+                else
+                    Object.Destroy(_model);
             }
         }
     }

@@ -21,15 +21,7 @@ public class DetectSurfaces : MonoBehaviour
             if (!bounds.Contains(pos)) continue;
 
             Vector3 dir = Vector3.down;
-            float originalY = pos.y;
-
-            if (pos.y < bounds.center.y)
-            {
-                dir = Vector3.up;
-                pos.y -= acceptableDist;
-            }
-            else
-                pos.y += acceptableDist;
+            pos.y = bounds.max.y;
 
             if (_objectsInside[i].Raycast(new Ray(pos, dir), out RaycastHit raycastHit, bounds.size.y + acceptableDist))
             {
