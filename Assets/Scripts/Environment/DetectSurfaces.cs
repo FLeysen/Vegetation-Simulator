@@ -12,15 +12,30 @@ public class DetectSurfaces : MonoBehaviour
         _collider = GetComponent<Collider>();
     }
 
-    public bool IsNearSurface(Vector3 pos, float acceptableDist)
+    public bool IsNearSurface(ref Vector3 pos, float acceptableDist)
     {
         for (int i = 0, length = _surfaces.Count; i < length; ++i)
         {
             Bounds bounds = _surfaces[i];
-            bounds.extents = new Vector3(bounds.extents.x + acceptableDist, bounds.extents.y + acceptableDist, bounds.extents.z + acceptableDist);
+            bounds.extents = new Vector3(bounds.extents.x, bounds.extents.y + acceptableDist, bounds.extents.z);
             if (!bounds.Contains(pos)) continue;
 
-            return true;
+            Vector3 dir = Vector3.down;
+            float originalY = pos.y;
+
+            if (pos.y < bounds.center.y)
+            {
+                dir = Vector3.up;
+                pos.y -= acceptableDist;
+            }
+            else
+                pos.y += acceptableDist;
+
+            if (_objectsInside[i].Raycast(new Ray(pos, dir), out RaycastHit raycastHit, bounds.size.y + acceptableDist))
+            {
+                pos = raycastHit.point;
+                return true;
+            }
         }
         return false;
     }
@@ -29,29 +44,6 @@ public class DetectSurfaces : MonoBehaviour
     {
         return _collider.bounds.Contains(position);
     }
-
-    private float CalculateSurface(Mesh mesh, Vector3 direction)
-    {
-        direction = direction.normalized;
-        int[] triangles = mesh.triangles;
-        Vector3[] vertices = mesh.vertices;
-
-        double sum = 0.0;
-
-        for (int i = 0, length = triangles.Length; i < length; i += 3)
-        {
-            Vector3 corner = vertices[triangles[i]];
-            Vector3 a = vertices[triangles[i + 1]] - corner;
-            Vector3 b = vertices[triangles[i + 2]] - corner;
-
-            float projection = Vector3.Dot(Vector3.Cross(b, a), direction);
-            if (projection > 0f)
-                sum += projection;
-        }
-
-        return (float)(sum / 2.0);
-    }
-
 
     public Collider GetNearestSurfaceTo(Vector3 pos, float maxYDifference)
     {

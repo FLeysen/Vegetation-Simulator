@@ -40,8 +40,38 @@ public class VegetationSystem : MonoBehaviour
                 spawnPos.x += Random.Range(-maxXDiff, maxXDiff);
                 spawnPos.z += Random.Range(-maxZDiff, maxZDiff);
                 spawnPos.y += Random.Range(-maxYDiff, maxZDiff);
-                nearestObject = _surfaceDetector.GetNearestSurfaceTo(spawnPos, bounds.extents.y);
-                spawnPos.y = nearestObject.bounds.max.y;
+                nearestObject = _surfaceDetector.GetNearestSurfaceTo(spawnPos, bounds.size.y);
+                spawnPos.y = bounds.max.y;
+
+
+                Vector3 originalPos = spawnPos;
+
+                for (float progress = 0.1f; progress < 1.01f; progress += 0.1f)
+                {
+                    Vector3 dir = Vector3.down;
+                    float wiggleRoom = 0.01f;
+
+                    if (spawnPos.y < bounds.center.y)
+                    {
+                        dir = Vector3.up;
+                        spawnPos.y -= wiggleRoom;
+                    }
+                    else
+                        spawnPos.y += wiggleRoom;
+
+
+                    if (nearestObject.Raycast(new Ray(spawnPos, dir), out RaycastHit raycastHit, bounds.size.y + wiggleRoom))
+                    {
+                        spawnPos = raycastHit.point;
+                        break;
+                    }
+                    else
+                    {
+                        spawnPos = Vector3.Lerp(originalPos, bounds.center, progress);
+                        spawnPos.y = originalPos.y;
+                    }
+                }
+
                 Plant plant = Instantiate(_possiblePlantPrefabs[i], spawnPos, transform.rotation).GetComponentInChildren<Plant>();
 
                 _plants.Add(plant);
@@ -60,9 +90,9 @@ public class VegetationSystem : MonoBehaviour
     /// <param name="plant"></param>
     /// <param name="creatorPosition"></param>
     /// <returns></returns>
-    public bool AttemptOccupy(Vector3 position, Plant plant, Vector3 creatorPosition)
+    public bool AttemptOccupy(ref Vector3 position, Plant plant, Vector3 creatorPosition)
     {
-        if (_surfaceDetector.IsNearSurface(position, 0.01f))
+        if (_surfaceDetector.IsNearSurface(ref position, 0.01f))
         {
             Vector3Int gridPos = _grid.WorldToCell(position);
             if (_gridOccupations.ContainsKey(gridPos))

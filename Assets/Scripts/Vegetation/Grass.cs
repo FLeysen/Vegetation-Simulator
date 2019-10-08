@@ -39,7 +39,7 @@ public class Grass : MonoBehaviour, IActOnDayPassing
     public void AddGrassToSystem(Vector3 pos, Vector3 creatorPos)
     {
         Plant plant = GetComponent<Plant>();
-        if(GetComponent<Plant>().VegetationSys.AttemptOccupy(pos, plant, creatorPos))
+        if(GetComponent<Plant>().VegetationSys.AttemptOccupy(ref pos, plant, creatorPos))
         {
             _grassSystem.Add(new GrassLeaf(pos, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this));
         }
