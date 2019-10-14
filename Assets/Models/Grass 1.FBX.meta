@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: a4c2fa92590852c49837ab39e7f81488
+guid: 8100a1e3558b468498e4311c8bf791aa
 ModelImporter:
   serializedVersion: 25
   internalIDToNameTable: []
@@ -31,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages: []
     globalScale: 1
@@ -53,9 +53,9 @@ ModelImporter:
     minBoneWeight: 0.001
     meshOptimizationFlags: -1
     indexFormat: 0
-    secondaryUVAngleDistortion: 10
-    secondaryUVAreaDistortion: 12
-    secondaryUVHardAngle: 90
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 10
+    secondaryUVHardAngle: 88
     secondaryUVPackMargin: 64
     useFileScale: 1
   tangentSpace:
