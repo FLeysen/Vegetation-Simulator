@@ -1,0 +1,5 @@
+Journal should try to be a bit more extensive (e.g.: did not write about surface detection)
+Talk about existing software in paper (how others do a certain thing..)
+Clarify when calculations happen - shader is also option
+Indeed move surface to research and put pieces in test case
+Second UV layer option for shadows and growth limitations
