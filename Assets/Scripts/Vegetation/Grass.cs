@@ -12,11 +12,7 @@ public class Grass : MonoBehaviour, IActOnDayPassing
 
     private List<GrassLeaf> _grassSystem = new List<GrassLeaf>();
 
-    public int LeafCount()
-    {
-        return _grassSystem.Count;
-    }
-
+    public int GetLeafCount() { return _grassSystem.Count; }
     public GameObject GetSeedModel() { return _seedModel; }
     public GameObject GetLeafModel() { return _leafModel; }
 
@@ -37,9 +33,9 @@ public class Grass : MonoBehaviour, IActOnDayPassing
     public void AddGrassToSystem(Vector3 pos, Vector3 creatorPos)
     {
         Plant plant = GetComponent<Plant>();
-        if(GetComponent<Plant>().VegetationSys.AttemptOccupy(ref pos, plant, creatorPos))
+        if(GetComponent<Plant>().VegetationSys.AttemptOccupy(ref pos, plant, creatorPos, out float shadowFactor))
         {
-            _grassSystem.Add(new GrassLeaf(pos, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this));
+            _grassSystem.Add(new GrassLeaf(pos, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, shadowFactor));
         }
     }
 
@@ -53,14 +49,14 @@ public class Grass : MonoBehaviour, IActOnDayPassing
 public class GrassLeaf
 {
     private GrassLeaf() { }
-    public GrassLeaf(Vector3 position, float dailySeedGrowthChance, uint averageSeedSurvivalDays, uint maxSeedSurvivalVariation, Grass grass)
+
+    public GrassLeaf(Vector3 position, float dailySeedGrowthChance, uint averageSeedSurvivalDays, uint maxSeedSurvivalVariation, Grass grass, float shadowAtPos)
     {
+        ShadowAtLocation = shadowAtPos;
         Position = position;
         Obj = grass.gameObject;
+
         GameObject model = Object.Instantiate(grass.GetSeedModel(), position, grass.transform.rotation, grass.transform);
-
-        Plant plant = Obj.GetComponent<Plant>();
-
         GrassSeedState seedState = new GrassSeedState(model, dailySeedGrowthChance, Random.Range((int)(averageSeedSurvivalDays - maxSeedSurvivalVariation), (int)(averageSeedSurvivalDays + maxSeedSurvivalVariation + 1)));
         GrassGrowingState growingState = new GrassGrowingState(this);
         GrassFullyGrownState fullyGrownState = new GrassFullyGrownState(this);
@@ -88,6 +84,10 @@ public class GrassLeaf
         _stateMachine = new StateMachine(grass, seedState);
     }
 
+    public GrassLeaf(Vector3 position, float dailySeedGrowthChance, uint averageSeedSurvivalDays, uint maxSeedSurvivalVariation, Grass grass)
+        : this(position, dailySeedGrowthChance, averageSeedSurvivalDays, maxSeedSurvivalVariation, grass, grass.gameObject.GetComponent<Plant>().ShadowFactor)
+    {}
+
     private void Die()
     {
         //TODO: Wither animation?
@@ -105,7 +105,9 @@ public class GrassLeaf
     }
 
     public Vector3 Position { get; private set; } = Vector3.zero;
-    public GameObject Obj { get; set; } = null;
+    public float ShadowAtLocation { get; private set; } = 0f;
+    public GameObject Obj { get; private set; } = null;
+
     private List<GrassConnection> _connections = new List<GrassConnection>();
     private StateMachine _stateMachine = null;
 }
@@ -145,7 +147,7 @@ namespace VegetationStates
             Plant plant = origin.GetComponent<Plant>();
             if (!plant.VegetationSys.AttemptOccupy(origin.transform.position, plant))
             {
-                if ((origin as Grass).LeafCount() == 1)
+                if ((origin as Grass).GetLeafCount() == 1)
                     Object.Destroy(origin.transform.parent.gameObject);
                 else
                     Object.Destroy(_model);
@@ -162,7 +164,7 @@ namespace VegetationStates
 
             if (--_survivalDaysLeft == 0)
             {
-                if ((origin as Grass).LeafCount() == 1)
+                if ((origin as Grass).GetLeafCount() == 1)
                     Object.Destroy(origin.transform.parent.gameObject);
                 else
                     Object.Destroy(_model);
@@ -177,7 +179,6 @@ namespace VegetationStates
         {
             _leaf = leaf;
         }
-
 
         public bool HasReachedTarget() { return _elapsedDays >= _daysToReachTarget; }
         private GrassLeaf _leaf = null;
@@ -196,6 +197,11 @@ namespace VegetationStates
             _model = Object.Instantiate(grass.GetLeafModel(), _leaf.Position, grass.GetLeafModel().transform.rotation, grass.transform);
             _initialScale = _model.transform.localScale;
             _targetScaleMultiplier = new Vector3(_initialScale.x * _targetScaleMultiplier.x, _initialScale.y * _targetScaleMultiplier.y, _initialScale.z * _targetScaleMultiplier.z);
+
+            Renderer renderer = _model.GetComponent<Renderer>();
+            Color col = renderer.material.color;
+            col.r = _leaf.ShadowAtLocation;
+            renderer.material.color = col;
         }
 
         public override void Exit(MonoBehaviour origin)
@@ -247,7 +253,7 @@ namespace VegetationStates
 
             if (--_daysToLive == 0)
             {
-                if ((origin as Grass).LeafCount() == 1)
+                if ((origin as Grass).GetLeafCount() == 1)
                     Object.Destroy(origin.transform.parent.gameObject);
                 else
                     Object.Destroy(_model);

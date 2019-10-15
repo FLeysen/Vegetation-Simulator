@@ -45,6 +45,8 @@ public class VegetationSystem : MonoBehaviour
 
 
                 Vector3 originalPos = spawnPos;
+                RaycastHit raycastHit = new RaycastHit();
+                float shadowFactor = 0f;
 
                 for (float progress = 0.1f; progress < 1.01f; progress += 0.1f)
                 {
@@ -52,9 +54,10 @@ public class VegetationSystem : MonoBehaviour
                     float wiggleRoom = 0.01f;
                     spawnPos.y = bounds.max.y;
 
-                    if (nearestObject.Raycast(new Ray(spawnPos, dir), out RaycastHit raycastHit, bounds.size.y + wiggleRoom))
+                    if (nearestObject.Raycast(new Ray(spawnPos, dir), out raycastHit, bounds.size.y + wiggleRoom))
                     {
                         spawnPos = raycastHit.point;
+                        shadowFactor = ShadowMaskSampler.Instance.CalculateShadowFromHit(raycastHit);
                         break;
                     }
                     else
@@ -68,6 +71,7 @@ public class VegetationSystem : MonoBehaviour
 
                 _plants.Add(plant);
                 plant.VegetationSys = this;
+                plant.ShadowFactor = shadowFactor;
 
                 spawnPos.x = center.x;
                 spawnPos.z = center.z;
@@ -82,9 +86,9 @@ public class VegetationSystem : MonoBehaviour
     /// <param name="plant"></param>
     /// <param name="creatorPosition"></param>
     /// <returns></returns>
-    public bool AttemptOccupy(ref Vector3 position, Plant plant, Vector3 creatorPosition)
+    public bool AttemptOccupy(ref Vector3 position, Plant plant, Vector3 creatorPosition, out float shadowFactor)
     {
-        if (_surfaceDetector.IsNearSurface(ref position, 0.01f))
+        if (_surfaceDetector.IsNearSurface(ref position, 0.01f, out shadowFactor))
         {
             Vector3Int gridPos = _grid.WorldToCell(position);
             if (_gridOccupations.ContainsKey(gridPos))

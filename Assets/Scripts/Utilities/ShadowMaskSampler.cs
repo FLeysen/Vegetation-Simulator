@@ -1,20 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class LightShadowMapTester : MonoBehaviour
+public class ShadowMaskSampler : Singleton<ShadowMaskSampler>
 {
-    [SerializeField] private Transform _indicator = null;
-    private Vector3 _fallbackPos = Vector3.zero;
-    private List<int> _lightCounts = new List<int>(); //This is NOT 0-4, but a bitmask (0 - 15)! It is assumed that lights will always only be inserted from r-a
-    private float _oneThird = 1f / 3f;
+    private List<int> _lightCounts = new List<int>(); //This is NOT 0-4, but a bitmask (0 - 15)!
+    private readonly float _oneThird = 1f / 3f;
 
     private void Start()
     {
         int value = 0;
         foreach(LightmapData lightmap in LightmapSettings.lightmaps)
         {
-            
             foreach (Color32 pixel in lightmap.shadowMask.GetPixels32())
             {
                 if (pixel.a == 0) { }
@@ -35,28 +31,37 @@ public class LightShadowMapTester : MonoBehaviour
             _lightCounts.Add(value);
             value = 0;
         }
-        _fallbackPos = _indicator.position;
     }
 
-    private void Update()
+    public float CalculateShadowFromHit(RaycastHit hit)
+    {
+        Vector2 coord = hit.lightmapCoord;
+        int lightIdx = hit.collider.GetComponent<MeshRenderer>().lightmapIndex;
+        Texture2D tex = LightmapSettings.lightmaps[lightIdx].shadowMask;
+        coord *= tex.height;
+        Color color = tex.GetPixel((int)coord.x, (int)coord.y);
+        return 1 - CalculateAverageShadow(color, lightIdx);
+    }
+
+    private void CalculateShadowAtMouse()
     {
         Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(mouseRay, out RaycastHit hitInfo, 1000.0f, LayerMask.GetMask("VegetationEnvironment")))
         {
-            _indicator.position = hitInfo.point;
             Vector2 coord = hitInfo.lightmapCoord;
             int lightIdx = hitInfo.collider.GetComponent<MeshRenderer>().lightmapIndex;
             Texture2D tex = LightmapSettings.lightmaps[lightIdx].shadowMask;
             coord *= tex.height;
             Color color = tex.GetPixel((int)coord.x, (int)coord.y);
-            Debug.Log(1 - CalculateAverageShadow(color, lightIdx));
-        }
-        else
-        {
-            _indicator.position = _fallbackPos;
         }
     }
 
+    /// <summary>
+    /// Shadow mask is 1 when no shadow is present, 0 when shadow is present.
+    /// </summary>
+    /// <param name="color"></param>
+    /// <param name="idx"></param>
+    /// <returns></returns>
     private float CalculateAverageShadow(Color color, int idx)
     {
         int val = _lightCounts[idx];

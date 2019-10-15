@@ -12,7 +12,7 @@ public class DetectSurfaces : MonoBehaviour
         _collider = GetComponent<Collider>();
     }
 
-    public bool IsNearSurface(ref Vector3 pos, float acceptableDist)
+    public bool IsNearSurface(ref Vector3 pos, float acceptableDist, out float shadowFactor)
     {
         for (int i = 0, length = _surfaces.Count; i < length; ++i)
         {
@@ -26,9 +26,11 @@ public class DetectSurfaces : MonoBehaviour
             if (_objectsInside[i].Raycast(new Ray(pos, dir), out RaycastHit raycastHit, bounds.size.y + acceptableDist))
             {
                 pos = raycastHit.point;
+                shadowFactor = ShadowMaskSampler.Instance.CalculateShadowFromHit(raycastHit);
                 return true;
             }
         }
+        shadowFactor = 0f;
         return false;
     }
 
