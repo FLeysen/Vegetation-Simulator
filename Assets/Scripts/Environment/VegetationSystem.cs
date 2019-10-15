@@ -140,6 +140,20 @@ public class VegetationSystem : MonoBehaviour
             _gridOccupations[gridPos] = null;
     }
 
+    public void RemoveOccupationsBy(Plant plant)
+    {
+        List<Vector3Int> _buffer = new List<Vector3Int>(); 
+
+        foreach (KeyValuePair<Vector3Int, Plant> pair in _gridOccupations)
+        {
+            if (pair.Value != plant) continue;
+            _buffer.Add(pair.Key);
+        }
+
+        foreach(Vector3Int key in _buffer)
+            _gridOccupations[key] = null;
+    }
+
     private void OnDayPassed()
     {
         foreach(Plant plant in _plants)

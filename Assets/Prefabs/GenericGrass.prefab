@@ -58,8 +58,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _dailySeedGrowthChance: 0.01
-  _averageSeedSurvivalDays: 17
-  _maxSeedSurvivalVariation: 12
+  _averageSeedSurvivalDays: 37
+  _maxSeedSurvivalVariation: 14
   _seedModel: {fileID: 198317915145828279, guid: 1f1a0e5a472e3bc44bc53dca80778750,
     type: 3}
   _leafModel: {fileID: 7711535535034718992, guid: 3429d5771035f1040aa864160145a957,
