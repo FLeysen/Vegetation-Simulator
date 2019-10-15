@@ -157,7 +157,7 @@ namespace VegetationStates
         public GrassSeedState(GameObject model, float spawnOddsPerDay, int maxSurvivalDays, GrassLeaf leaf, bool firstSeed)
         {
             _model = model;
-            _spawnOddsPerDay = spawnOddsPerDay;
+            _spawnOddsPerDay = spawnOddsPerDay * Mathf.Clamp((1 - leaf.ShadowAtLocation), 0.25f, 1f);
             _survivalDaysLeft = maxSurvivalDays;
             _leaf = leaf;
             _firstSeed = firstSeed;
@@ -201,17 +201,16 @@ namespace VegetationStates
         public GrassGrowingState(GrassLeaf leaf)
         {
             _leaf = leaf;
+            _daysToReachTarget += (int)(leaf.ShadowAtLocation * _daysToReachTarget);
         }
 
         public bool HasReachedTarget() { return _elapsedDays >= _daysToReachTarget; }
-        private GrassLeaf _leaf = null;
-
-        //TODO: Remove this test segment, should respond to light etc.
-        private int _daysToReachTarget = 30;
+        private int _daysToReachTarget = Random.Range(25, 40);
         private int _elapsedDays = 0;
         private Vector3 _initialScale = new Vector3(0.1f, 0.1f, 0.1f);
         private Vector3 _targetScaleMultiplier = new Vector3(2f, 2f, 2f);
         private GameObject _model = null;
+        private GrassLeaf _leaf = null;
 
 
         public override void Enter(MonoBehaviour origin)
@@ -242,17 +241,15 @@ namespace VegetationStates
     {
         private float _distanceSpawned = 0.5f;
         private float _chanceToSpawn = 0.02f;
-        private GrassLeaf _leaf = null;
-
-        //TODO: Remove this test segment, should respond to light etc.
         private int _daysToLive = Random.Range(450, 650);
+        private GrassLeaf _leaf = null;
         private GameObject _model = null;
-
 
         private GrassFullyGrownState() { }
         public GrassFullyGrownState(GrassLeaf leaf)
         {
             _leaf = leaf;
+            _chanceToSpawn *= Mathf.Clamp((1 - leaf.ShadowAtLocation), 0.25f, 1f);
         }
 
         public override void Enter(MonoBehaviour origin)

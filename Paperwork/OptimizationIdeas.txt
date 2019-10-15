@@ -1,0 +1,5 @@
+Optimization ideas (grass):
+Calculate area of influence (outermost "points" => base spreading on that)
+=> area of influence visualizes grass "in some way" (could place some simple planes instead?)
+=> once grass leaf is fully grown => no longer retains individuality and becomes part of AoI
+
