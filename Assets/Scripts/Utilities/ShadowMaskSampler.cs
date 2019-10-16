@@ -35,12 +35,14 @@ public class ShadowMaskSampler : Singleton<ShadowMaskSampler>
 
     public float CalculateShadowFromHit(RaycastHit hit)
     {
-        Vector2 coord = hit.lightmapCoord;
+        Vector2 uvCoord = hit.lightmapCoord;
         int lightIdx = hit.collider.GetComponent<MeshRenderer>().lightmapIndex;
+
         Texture2D tex = LightmapSettings.lightmaps[lightIdx].shadowMask;
-        coord *= tex.height;
-        Color color = tex.GetPixel((int)coord.x, (int)coord.y);
-        return 1 - CalculateAverageShadow(color, lightIdx);
+        uvCoord *= tex.height;
+        Color color = tex.GetPixel((int)uvCoord.x, (int)uvCoord.y);
+
+        return 1 - CalculateMaskAverage(color, lightIdx);
     }
 
     private void CalculateShadowAtMouse()
@@ -62,7 +64,7 @@ public class ShadowMaskSampler : Singleton<ShadowMaskSampler>
     /// <param name="color"></param>
     /// <param name="idx"></param>
     /// <returns></returns>
-    private float CalculateAverageShadow(Color color, int idx)
+    private float CalculateMaskAverage(Color color, int idx)
     {
         int val = _lightCounts[idx];
         if (val < 2)
