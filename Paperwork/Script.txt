@@ -12,3 +12,6 @@ So what are the specifics? It's a framework built in Unity that allows users to 
 Those plants can define their own rules, which the system can provide information for like how much light a spot gets or where the surfaces actually are.
 Time then passes one day at a time on set intervals or whenever the system is requested to have a certain amount of days pass.
 So... why? Well... while there are tools that facilitate the building of a vegetation enviroment like for example the procedural vegetation tool of Unreal Engine, none go for something that actually evolves over time and mostly ignore factors such as shadow. You could for instance use this in a situation where a player leaves an area for a long time (at least in-game) and have the environment noticeably be changed in a believable manner.
+
+== SLIDE 4: Papapapppapaappp ==
+DIDIDIBIBIBIDID
