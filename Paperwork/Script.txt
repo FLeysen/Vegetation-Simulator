@@ -1,0 +1,14 @@
+== SLIDE 1: Introduction ==
+Good morning, I'm Floris and thank you for joining me in this presentation about long-term sci-fi vegetation progression simulation.
+Now.. that's a long title. What does it mean? Allow me to show you.
+== ADVANCE TO SLIDE TWO ==
+
+== SLIDE 2: Video ==
+As you can see, an empty environment is being filled up with vegetation that changes and evolves over time. It is based on multiple factors including the amount of light a spot gets, the passing of seasons and the rules each type of plant has defined for itself.
+== ADVANCE TO SLIDE THREE AFTER VIDEO FINISHES ==
+
+== SLIDE 3: What and why? ==
+So what are the specifics? It's a framework built in Unity that allows users to define an area and some parameters: how long season last, which plants are allowed to grow in there and how many seeds of each of those are present at the start. 
+Those plants can define their own rules, which the system can provide information for like how much light a spot gets or where the surfaces actually are.
+Time then passes one day at a time on set intervals or whenever the system is requested to have a certain amount of days pass.
+So... why? Well... while there are tools that facilitate the building of a vegetation enviroment like for example the procedural vegetation tool of Unreal Engine, none go for something that actually evolves over time and mostly ignore factors such as shadow. You could for instance use this in a situation where a player leaves an area for a long time (at least in-game) and have the environment noticeably be changed in a believable manner.
