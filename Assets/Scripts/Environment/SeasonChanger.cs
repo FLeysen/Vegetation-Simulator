@@ -8,7 +8,7 @@ public enum Season
     Autumn
 }
 
-public class SeasonChanger : MonoBehaviour
+public class SeasonChanger : Singleton<SeasonChanger>
 {
     [SerializeField] private UnityEngine.UI.Text _seasonText = null;
     [SerializeField] private Season _season = Season.Spring;
@@ -18,6 +18,8 @@ public class SeasonChanger : MonoBehaviour
     [SerializeField] private uint _daysInWinter = 91;
     private uint _elapsedDays = 0;
     private uint _daysInSeason = 91;
+
+    public Season GetSeason() { return _season; }
 
     private void Start()
     {

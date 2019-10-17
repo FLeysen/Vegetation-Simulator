@@ -74,12 +74,13 @@ public class GrassLeaf
     {
         ShadowAtLocation = shadowAtPos;
         Position = position;
-        Obj = grass.gameObject;
 
-        GameObject model = Object.Instantiate(grass.GetSeedModel(), position, grass.transform.rotation, grass.transform);
+        //GameObject model = Object.Instantiate(grass.GetSeedModel(), position, grass.transform.rotation, grass.transform);
+        GameObject model = null;
         GrassSeedState seedState = new GrassSeedState(model, dailySeedGrowthChance, Random.Range((int)(averageSeedSurvivalDays - maxSeedSurvivalVariation), (int)(averageSeedSurvivalDays + maxSeedSurvivalVariation + 1)), this, firstLeaf);
         GrassGrowingState growingState = new GrassGrowingState(this);
-        GrassFullyGrownState fullyGrownState = new GrassFullyGrownState(this);
+        GrassFullyGrownState fullyGrownState = new GrassFullyGrownState();
+        GrassDormantState dormantState = new GrassDormantState(this);
 
         StateTransition seedToGrowing = new StateTransition
             ((originObject, originState)
@@ -101,18 +102,35 @@ public class GrassLeaf
         growingToGrown.TargetState = fullyGrownState;
         growingState.Transitions.Add(growingToGrown);
 
+        StateTransition toDormant = new StateTransition
+            ((originObject, originState)
+            =>
+            {
+                if (SeasonChanger.Instance.GetSeason() != Season.Winter) return StateTransitionResult.NO_ACTION;
+                return StateTransitionResult.STACK_PUSH;
+            });
+        toDormant.TargetState = dormantState;
+        growingState.Transitions.Add(toDormant);
+        fullyGrownState.Transitions.Add(toDormant);
+        seedState.Transitions.Add(toDormant);
+
+        StateTransition leaveDormancy = new StateTransition
+            ((originObject, originState)
+            =>
+            {
+                if (SeasonChanger.Instance.GetSeason() == Season.Winter) return StateTransitionResult.NO_ACTION;
+                return StateTransitionResult.STACK_POP;
+            });
+        leaveDormancy.TargetState = null;
+        dormantState.Transitions.Add(leaveDormancy);
+
+
         _stateMachine = new StateMachine(grass, seedState);
     }
 
     public GrassLeaf(Vector3 position, float dailySeedGrowthChance, uint averageSeedSurvivalDays, uint maxSeedSurvivalVariation, Grass grass, bool firstLeaf)
         : this(position, dailySeedGrowthChance, averageSeedSurvivalDays, maxSeedSurvivalVariation, grass, grass.gameObject.GetComponent<Plant>().ShadowFactor, firstLeaf)
     {}
-
-    private void Die()
-    {
-        //TODO: Wither animation?
-        Obj.SetActive(false);
-    }
 
     public void Update()
     {
@@ -126,7 +144,7 @@ public class GrassLeaf
 
     public Vector3 Position { get; private set; } = Vector3.zero;
     public float ShadowAtLocation { get; private set; } = 0f;
-    public GameObject Obj { get; private set; } = null;
+    public GameObject CurrentModel { get; set; } = null;
 
     private List<GrassConnection> _connections = new List<GrassConnection>();
     private StateMachine _stateMachine = null;
@@ -164,7 +182,9 @@ namespace VegetationStates
         }
 
         public override void Enter(MonoBehaviour origin)
-        { }
+        {
+            _leaf.CurrentModel = _model;
+        }
 
         public override void Exit(MonoBehaviour origin)
         {
@@ -201,76 +221,37 @@ namespace VegetationStates
         public GrassGrowingState(GrassLeaf leaf)
         {
             _leaf = leaf;
-            _daysToReachTarget += (int)(leaf.ShadowAtLocation * _daysToReachTarget);
+            _chanceToSpawn *= (1f - leaf.ShadowAtLocation) * 0.5f + 0.5f;
         }
 
-        public bool HasReachedTarget() { return _elapsedDays >= _daysToReachTarget; }
-        private int _daysToReachTarget = Random.Range(25, 40);
-        private int _elapsedDays = 0;
-        private Vector3 _initialScale = new Vector3(0.1f, 0.1f, 0.1f);
-        private Vector3 _targetScaleMultiplier = new Vector3(2f, 2f, 2f);
-        private GameObject _model = null;
-        private GrassLeaf _leaf = null;
-
-
-        public override void Enter(MonoBehaviour origin)
-        {
-            Grass grass = origin as Grass;
-            _model = Object.Instantiate(grass.GetLeafModel(), _leaf.Position, grass.GetLeafModel().transform.rotation, grass.transform);
-            _initialScale = _model.transform.localScale;
-            _targetScaleMultiplier = new Vector3(_initialScale.x * _targetScaleMultiplier.x, _initialScale.y * _targetScaleMultiplier.y, _initialScale.z * _targetScaleMultiplier.z);
-
-            Renderer renderer = _model.GetComponent<Renderer>();
-            Color col = renderer.material.color;
-            col.r = _leaf.ShadowAtLocation;
-            renderer.material.color = col;
-        }
-
-        public override void Exit(MonoBehaviour origin)
-        {
-            Object.Destroy(_model);
-        }
-
-        public override void Update(MonoBehaviour origin)
-        {
-            _model.transform.localScale = Vector3.Lerp(_initialScale, _targetScaleMultiplier, (float)(++_elapsedDays) / _daysToReachTarget);
-        }
-    }
-
-    public class GrassFullyGrownState : State
-    {
+        public bool HasReachedTarget() { return _leaf.CurrentModel.transform.localScale.y > _maxScale; }
+        private float _chanceToSpawn = 0.04f;
+        private float _maxScale = 2f;
         private float _distanceSpawned = 0.5f;
-        private float _chanceToSpawn = 0.02f;
-        private int _daysToLive = Random.Range(450, 650);
+        private Vector3 _initialScale = new Vector3(0.1f, 0.1f, 0.1f);
+        private Vector3 _amountAddedPerDay = new Vector3(0.002f, 0.002f, 0.002f);
         private GrassLeaf _leaf = null;
-        private GameObject _model = null;
-
-        private GrassFullyGrownState() { }
-        public GrassFullyGrownState(GrassLeaf leaf)
-        {
-            _leaf = leaf;
-            _chanceToSpawn *= Mathf.Clamp((1 - leaf.ShadowAtLocation), 0.25f, 1f);
-        }
 
         public override void Enter(MonoBehaviour origin)
         {
             Grass grass = origin as Grass;
-            _model = Object.Instantiate(grass.GetLeafModel(), _leaf.Position, grass.GetLeafModel().transform.rotation, grass.transform);
-            _model.transform.localScale = new Vector3(1f, 1f, 1f);
-           
-            Renderer renderer = _model.GetComponent<Renderer>();
-            Color col = renderer.material.color;
-            col.r = _leaf.ShadowAtLocation;
-            renderer.material.color = col;
+            _leaf.CurrentModel = Object.Instantiate(grass.GetLeafModel(), _leaf.Position, grass.GetLeafModel().transform.rotation, grass.transform);
+            _initialScale = _leaf.CurrentModel.transform.localScale;
+
+            //Renderer renderer = _leaf.CurrentModel.GetComponent<Renderer>();
+            //Color col = renderer.material.color;
+            //col.r = _leaf.ShadowAtLocation;
+            //renderer.material.color = col;
         }
 
         public override void Exit(MonoBehaviour origin)
         {
-
         }
 
         public override void Update(MonoBehaviour origin)
         {
+            _leaf.CurrentModel.transform.localScale += _amountAddedPerDay;
+
             if (Random.Range(0f, 1f) <= _chanceToSpawn)
             {
                 Vector3 targetPos = _leaf.Position;
@@ -278,11 +259,46 @@ namespace VegetationStates
                 targetPos += new Vector3(Mathf.Cos(randomAngle) * _distanceSpawned, 0f, Mathf.Sin(randomAngle) * _distanceSpawned);
                 (origin as Grass).AddGrassToSystem(targetPos, _leaf.Position);
             }
+        }
+    }
 
-            if (--_daysToLive == 0)
+    public class GrassFullyGrownState : State
+    {
+        public GrassFullyGrownState() { }
+
+        public override void Enter(MonoBehaviour origin) { }
+
+        public override void Exit(MonoBehaviour origin) { }
+
+        public override void Update(MonoBehaviour origin) { }
+    }
+
+    public class GrassDormantState : State
+    {
+        private float _chanceToWither = 0.002f;
+        private GrassLeaf _leaf = null;
+
+        private GrassDormantState() { }
+        public GrassDormantState(GrassLeaf leaf)
+        {
+            _leaf = leaf;
+        }
+
+        public override void Enter(MonoBehaviour origin)
+        {
+        }
+
+        public override void Exit(MonoBehaviour origin)
+        {
+
+        }
+
+        public override void Update(MonoBehaviour origin)
+        {
+            if (Random.Range(0f, 1f) <= _chanceToWither)
             {
                 (origin as Grass).DeregisterLeaf(_leaf);
-                Object.Destroy(_model);
+                Object.Destroy(_leaf.CurrentModel);
             }
         }
     }
