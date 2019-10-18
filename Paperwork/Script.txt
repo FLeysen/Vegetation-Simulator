@@ -4,14 +4,32 @@ Now.. that's a long title. What does it mean? Allow me to show you.
 == ADVANCE TO SLIDE TWO ==
 
 == SLIDE 2: Video ==
-As you can see, an empty environment is being filled up with vegetation that changes and evolves over time. It is based on multiple factors including the amount of light a spot gets, the passing of seasons and the rules each type of plant has defined for itself.
+As you can see, an empty environment is being filled up with vegetation that changes and evolves over time. It does this based on multiple factors including the amount of light a spot gets, the passing of seasons and the rules each type of plant has defined for itself.
 == ADVANCE TO SLIDE THREE AFTER VIDEO FINISHES ==
 
 == SLIDE 3: What and why? ==
 So what are the specifics? It's a framework built in Unity that allows users to define an area and some parameters: how long season last, which plants are allowed to grow in there and how many seeds of each of those are present at the start. 
-Those plants can define their own rules, which the system can provide information for like how much light a spot gets or where the surfaces actually are.
+Those plants can define their own rules, which the system can provide information for, say, how much light a spot gets or where the surfaces actually are.
 Time then passes one day at a time on set intervals or whenever the system is requested to have a certain amount of days pass.
-So... why? Well... while there are tools that facilitate the building of a vegetation enviroment like for example the procedural vegetation tool of Unreal Engine, none go for something that actually evolves over time and mostly ignore factors such as shadow. You could for instance use this in a situation where a player leaves an area for a long time (at least in-game) and have the environment noticeably be changed in a believable manner.
+So... why? Well... while there are tools that facilitate the building of a vegetation enviroment, for example the procedural vegetation tool of Unreal Engine, none go for something that actually evolves over time and they mostly ignore factors such as shadow. You could for instance use this in a situation where a player leaves an area for a long time (at least in-game) and have the environment noticeably be changed in a believable manner.
+== ADVANCE TO SLIDE FOUR ==
 
-== SLIDE 4: Papapapppapaappp ==
-DIDIDIBIBIBIDID
+== SLIDE 4: Research: model, plants & surfaces ==
+Before getting started on creating systems, it's important to consider possible models to represent the simulation. [IMPROVE THIS SEGMENT]
+It is of course vital to know how plants actually work; when they grow, how long they live, the whole package. As it turned out grasses have all the basic characteristics other plants have and more! Creating grasses thus became priority.
+So, surfaces. What do we need? Something that allows both easy positioning of plants, and tracking where they exist without needing to do something as crazy as loop over every individual plant to compare their positions. 
+== ADVANCE TO SLIDE FIVE ==
+
+== SLIDE 5: Research: light & optimization ==
+The focus here was to find a way to allow users of the system to easily access the shadow factor on a plant's spot to be able to use it for whichever purpose they want. You'll probably notice that in the test case it's used as a density map for the grass.
+Shadowmaps seem to do exactly what's needed, nicely showing the amount of shadow everywhere. The problem is just that shadowmaps are for single lights and combining them would be.. bothersome. Especially considering the fact that it's realtime and would need to be redone every frame.
+So lightmap baking was the other option. You actually have to jump through some hoops to get it to both bake usable maps and having them be accessible through code, but it can be done. Here, the problem is that lightmaps are very variable. They can change based on the colour, amount, intensity of lights present and jumping through those additional flaming hoops is silly when the light bakes simply provide a shadow mask as well. 
+Shadow masks can hold up to four lights. One light per channel, where a value of 0 means the hardest shadow and 1 no shadow at all.
+Calculating the average time something spends in shadow over a day is not achievable in the context of something that can't afford to be performing eternally long calculations, but just basing the shadow on a single time of day light position is clearly not right, either. Because the shadow mask allows up to four lights, it's possible to place reference lights that represent different times of day. Then those will be used to average out a reasonably accurate value.
+== ADVANCE TO SLIDE SIX ==
+
+== SLIDE 6: Case study: surfaces ==
+== ADVANCE TO SLIDE SEVEN ==
+
+== SLIDE 7: Case study: shadows ==
+== ADVANCE TO SLIDE EIGHT ==
