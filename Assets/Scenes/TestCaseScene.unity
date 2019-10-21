@@ -1596,7 +1596,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _possiblePlantPrefabs:
-  - {fileID: 2215387684197432118, guid: d0e3a993fafb1104f911de22fba6b6d2, type: 3}
+  - {fileID: 2215387684197432118, guid: 4a2d7f4b297fde545ad8108844a180ea, type: 3}
   _seedsBeforeStart: e8030000
 --- !u!156049354 &1592667137
 Grid:
