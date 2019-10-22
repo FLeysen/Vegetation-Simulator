@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 5236946484475734406}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalScale: {x: 1, y: 0.1, z: 1}
   m_Children:
   - {fileID: 3644347607474879527}
   m_Father: {fileID: 0}
@@ -42,12 +42,13 @@ GameObject:
   - component: {fileID: 3644347607474879527}
   - component: {fileID: 3261285596645826187}
   - component: {fileID: 3675468167783449616}
+  - component: {fileID: 4260705642721217406}
   m_Layer: 0
   m_Name: grassBunch (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 122
   m_IsActive: 1
 --- !u!4 &3644347607474879527
 Transform:
@@ -56,13 +57,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5541845244520116961}
-  m_LocalRotation: {x: 0.2613518, y: 0.65703523, z: 0.65703523, w: -0.2613518}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 45.000023, y: 45.00001, z: 45.000015}
   m_Children: []
   m_Father: {fileID: 8224118309258211787}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90.00001, y: 0, z: 0}
 --- !u!33 &3261285596645826187
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -88,7 +89,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f535dc5d35eac3647b315246c6922e55, type: 2}
+  - {fileID: 2100000, guid: 498c67770331d934ab9f23cf66372cd1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -108,3 +109,15 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &4260705642721217406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5541845244520116961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b75d7d76b5c3f2946b9ca3497e7821f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

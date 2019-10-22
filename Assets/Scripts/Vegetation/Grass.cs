@@ -35,7 +35,7 @@ public class Grass : MonoBehaviour, IActOnDayPassing
     public void AddGrassToSystem(Vector3 pos, Vector3 creatorPos)
     {
         Plant plant = GetComponent<Plant>();
-        if(plant.VegetationSys.AttemptOccupy(ref pos, plant, creatorPos, out float shadowFactor))
+        if(plant.VegetationSys.AttemptHardOccupy(ref pos, plant, out float shadowFactor))
         {
             _grassSystem.Add(new GrassLeaf(pos, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, shadowFactor, false));
         }
@@ -57,9 +57,11 @@ public class Grass : MonoBehaviour, IActOnDayPassing
     {
         _removeBuffer.Add(leaf);
 
+        Plant plant = GetComponent<Plant>();
+        plant.VegetationSys.RemoveOccupationAt(leaf.Position);
+
         if (_grassSystem.Count == _removeBuffer.Count)
         {
-            Plant plant = GetComponent<Plant>();
             plant.VegetationSys.RemoveOccupationsBy(plant);
             Destroy(transform.parent.gameObject);
         }
@@ -75,11 +77,10 @@ public class GrassLeaf
         ShadowAtLocation = shadowAtPos;
         Position = position;
 
-        //GameObject model = Object.Instantiate(grass.GetSeedModel(), position, grass.transform.rotation, grass.transform);
         GameObject model = null;
         GrassSeedState seedState = new GrassSeedState(model, dailySeedGrowthChance, Random.Range((int)(averageSeedSurvivalDays - maxSeedSurvivalVariation), (int)(averageSeedSurvivalDays + maxSeedSurvivalVariation + 1)), this, firstLeaf);
         GrassGrowingState growingState = new GrassGrowingState(this);
-        GrassFullyGrownState fullyGrownState = new GrassFullyGrownState();
+        GrassFullyGrownState fullyGrownState = new GrassFullyGrownState(this);
         GrassDormantState dormantState = new GrassDormantState(this);
 
         StateTransition seedToGrowing = new StateTransition
@@ -225,11 +226,11 @@ namespace VegetationStates
         }
 
         public bool HasReachedTarget() { return _leaf.CurrentModel.transform.localScale.y > _maxScale; }
-        private float _chanceToSpawn = 0.04f;
-        private float _maxScale = 2f;
+        private float _chanceToSpawn = 0.12f;
+        private float _maxScale = Random.Range(0.9f, 1.1f);
         private float _distanceSpawned = 0.5f;
         private Vector3 _initialScale = new Vector3(0.1f, 0.1f, 0.1f);
-        private Vector3 _amountAddedPerDay = new Vector3(0.002f, 0.002f, 0.002f);
+        private Vector3 _amountAddedPerDay = new Vector3(0.000f, 0.002f, 0.000f);
         private GrassLeaf _leaf = null;
 
         public override void Enter(MonoBehaviour origin)
@@ -238,10 +239,23 @@ namespace VegetationStates
             _leaf.CurrentModel = Object.Instantiate(grass.GetLeafModel(), _leaf.Position, grass.GetLeafModel().transform.rotation, grass.transform);
             _initialScale = _leaf.CurrentModel.transform.localScale;
 
-            //Renderer renderer = _leaf.CurrentModel.GetComponent<Renderer>();
-            //Color col = renderer.material.color;
-            //col.r = _leaf.ShadowAtLocation;
-            //renderer.material.color = col;
+            Mesh mesh = _leaf.CurrentModel.GetComponentInChildren<MeshFilter>().mesh;
+            Vector3[] vertices = mesh.vertices;
+            Color32[] colours = new Color32[vertices.Length];
+            
+            for (int i = 0, length = vertices.Length; i < length; i += 10)
+            {
+                byte value = (byte)(((i * 255 / length) < _leaf.ShadowAtLocation) ? 1 : 0);
+                Color32 colour = new Color32(value, value, value, value);
+
+                for (int j = 0; j < 10; ++j)
+                    colours[i + j] = colour;
+            }
+            mesh.colors32 = colours;
+
+            Vector3 rotation = _leaf.CurrentModel.transform.localEulerAngles;
+            rotation.y = Random.Range(0f, 359.9999f);
+            _leaf.CurrentModel.transform.localEulerAngles = rotation;
         }
 
         public override void Exit(MonoBehaviour origin)
@@ -257,6 +271,7 @@ namespace VegetationStates
                 Vector3 targetPos = _leaf.Position;
                 float randomAngle = Random.Range(0f, Mathf.PI * 2f);
                 targetPos += new Vector3(Mathf.Cos(randomAngle) * _distanceSpawned, 0f, Mathf.Sin(randomAngle) * _distanceSpawned);
+                targetPos.y += 2.5f * Random.Range(-1f, 1f);
                 (origin as Grass).AddGrassToSystem(targetPos, _leaf.Position);
             }
         }
@@ -264,18 +279,31 @@ namespace VegetationStates
 
     public class GrassFullyGrownState : State
     {
-        public GrassFullyGrownState() { }
+        private GrassLeaf _leaf = null;
+        private float _chanceToSpawn = 0.12f;
+        private float _distanceSpawned = 0.5f;
+
+        public GrassFullyGrownState(GrassLeaf leaf) { _leaf = leaf; }
 
         public override void Enter(MonoBehaviour origin) { }
 
         public override void Exit(MonoBehaviour origin) { }
 
-        public override void Update(MonoBehaviour origin) { }
+        public override void Update(MonoBehaviour origin)
+        {
+            if (Random.Range(0f, 1f) <= _chanceToSpawn)
+            {
+                Vector3 targetPos = _leaf.Position;
+                float randomAngle = Random.Range(0f, Mathf.PI * 2f);
+                targetPos += new Vector3(Mathf.Cos(randomAngle) * _distanceSpawned, 0f, Mathf.Sin(randomAngle) * _distanceSpawned);
+                (origin as Grass).AddGrassToSystem(targetPos, _leaf.Position);
+            }
+        }
     }
 
     public class GrassDormantState : State
     {
-        private float _chanceToWither = 0.002f;
+        private float _chanceToWither = 0.0001f;
         private GrassLeaf _leaf = null;
 
         private GrassDormantState() { }

@@ -80,13 +80,35 @@ public class VegetationSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Use this version when the new plant is allowed to take a spot inside the creator's already occupied area
+    /// Use this version when the new plant is not allowed to take a spot inside the plant's already occupied area
     /// </summary>
     /// <param name="position"></param>
     /// <param name="plant"></param>
     /// <param name="creatorPosition"></param>
     /// <returns></returns>
-    public bool AttemptOccupy(ref Vector3 position, Plant plant, Vector3 creatorPosition, out float shadowFactor)
+    public bool AttemptHardOccupy(ref Vector3 position, Plant plant, out float shadowFactor)
+    {
+        if (_surfaceDetector.IsNearSurface(ref position, 0.01f, out shadowFactor))
+        {
+            Vector3Int gridPos = _grid.WorldToCell(position);
+
+            if (_gridOccupations.ContainsKey(gridPos))
+            {
+                if (_gridOccupations[gridPos] != null)
+                    return false;
+                else
+                {
+                    _gridOccupations[gridPos] = plant;
+                    return true;
+                }
+            }
+            _gridOccupations.Add(gridPos, plant);
+            return true;
+        }
+        return false;
+    }
+
+    public bool AttemptOccupy(ref Vector3 position, Plant plant, out float shadowFactor)
     {
         if (_surfaceDetector.IsNearSurface(ref position, 0.01f, out shadowFactor))
         {

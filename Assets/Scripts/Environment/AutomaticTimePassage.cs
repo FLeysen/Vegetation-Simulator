@@ -5,7 +5,7 @@ public class AutomaticTimePassage : MonoBehaviour
     [SerializeField] private KeyCode _pauseButton = KeyCode.Space;
     [SerializeField] private float _secondsPerDay = 3f;
     private float _elapsedToday = 0f;
-    private bool _isPaused = false;
+    private bool _isPaused = true;
 
     private TrackAndPassTime _time = null;
 
@@ -21,7 +21,8 @@ public class AutomaticTimePassage : MonoBehaviour
 
         if (!_isPaused)
         {
-            if ((_elapsedToday += Time.deltaTime) > _secondsPerDay)
+            _elapsedToday += Time.deltaTime;
+            while (_elapsedToday > _secondsPerDay)
             {
                 _time.PassDay();
                 _elapsedToday -= _secondsPerDay;
