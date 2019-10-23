@@ -30,7 +30,7 @@
 					fixed3 diff : COLOR0;
 					fixed3 ambient : COLOR1;
 					float4 pos : SV_POSITION;
-					float shade : SHADE;
+					fixed shade : SHADE;
 				};
 
 				v2f vert(appdata_full v)
@@ -42,7 +42,7 @@
 					half nl = max(0, dot(worldNormal, _WorldSpaceLightPos0.xyz));
 					o.diff = nl * _LightColor0.rgb, 0;
 					o.ambient = ShadeSH9(half4(worldNormal,1));
-					o.shade = -v.color.r;
+					o.shade = v.color.r;
 					// compute shadows data
 					TRANSFER_SHADOW(o)
 					return o;
@@ -52,7 +52,7 @@
 
 				fixed4 frag(v2f i) : SV_Target
 				{
-					clip(i.shade);
+					clip(-i.shade);
 					fixed4 col = tex2D(_MainTex, i.uv);
 					// compute shadow attenuation (1.0 = fully lit, 0.0 = fully shadowed)
 					fixed shadow = SHADOW_ATTENUATION(i);

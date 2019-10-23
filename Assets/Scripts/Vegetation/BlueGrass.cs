@@ -2,18 +2,18 @@
 using VegetationStates;
 using System.Collections.Generic;
 
-public class Grass : MonoBehaviour, IActOnDayPassing
+public class BlueGrass : MonoBehaviour, IActOnDayPassing
 {
     [SerializeField] [Range(0.001f, 1f)] private float _dailySeedGrowthChance = 0.01f;
     [SerializeField] private uint _averageSeedSurvivalDays = 17;
     [SerializeField] private uint _maxSeedSurvivalVariation = 12;
     [SerializeField] private GameObject _leafModel = null;
 
-    private List<GrassLeaf> _grassSystem = new List<GrassLeaf>();
-    private List<GrassLeaf> _removables = new List<GrassLeaf>();
-    private List<GrassLeaf> _removeBuffer = new List<GrassLeaf>();
+    private List<BlueGrassLeaf> _BlueGrassSystem = new List<BlueGrassLeaf>();
+    private List<BlueGrassLeaf> _removables = new List<BlueGrassLeaf>();
+    private List<BlueGrassLeaf> _removeBuffer = new List<BlueGrassLeaf>();
 
-    public int GetLeafCount() { return _grassSystem.Count; }
+    public int GetLeafCount() { return _BlueGrassSystem.Count; }
     public GameObject GetLeafModel() { return _leafModel; }
 
     private void OnValidate()
@@ -27,38 +27,38 @@ public class Grass : MonoBehaviour, IActOnDayPassing
 
     private void Start()
     {
-        _grassSystem.Add(new GrassLeaf(transform.position, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, true));
+        _BlueGrassSystem.Add(new BlueGrassLeaf(transform.position, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, true));
     }
 
-    public void AddGrassToSystem(Vector3 pos, Vector3 creatorPos)
+    public void AddBlueGrassToSystem(Vector3 pos, Vector3 creatorPos)
     {
         Plant plant = GetComponent<Plant>();
-        if(plant.VegetationSys.AttemptHardOccupy(ref pos, plant, out float shadowFactor))
+        if (plant.VegetationSys.AttemptHardOccupy(ref pos, plant, out float shadowFactor))
         {
-            _grassSystem.Add(new GrassLeaf(pos, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, shadowFactor, false));
+            _BlueGrassSystem.Add(new BlueGrassLeaf(pos, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, shadowFactor, false));
         }
     }
 
     public void OnDayPassed()
     {
-        for (int i = 0, size = _grassSystem.Count; i < size; ++i)
-            _grassSystem[i].Update();
+        for (int i = 0, size = _BlueGrassSystem.Count; i < size; ++i)
+            _BlueGrassSystem[i].Update();
 
-        foreach(GrassLeaf leaf in _removables)
-            _grassSystem.Remove(leaf);
+        foreach (BlueGrassLeaf leaf in _removables)
+            _BlueGrassSystem.Remove(leaf);
 
         _removables = _removeBuffer;
         _removeBuffer.Clear();
     }
 
-    public void DeregisterLeaf(GrassLeaf leaf)
+    public void DeregisterLeaf(BlueGrassLeaf leaf)
     {
         _removeBuffer.Add(leaf);
 
         Plant plant = GetComponent<Plant>();
         plant.VegetationSys.RemoveOccupationAt(leaf.Position);
 
-        if (_grassSystem.Count == _removeBuffer.Count)
+        if (_BlueGrassSystem.Count == _removeBuffer.Count)
         {
             plant.VegetationSys.RemoveOccupationsBy(plant);
             Destroy(transform.parent.gameObject);
@@ -66,26 +66,26 @@ public class Grass : MonoBehaviour, IActOnDayPassing
     }
 }
 
-public class GrassLeaf
+public class BlueGrassLeaf
 {
-    private GrassLeaf() { }
+    private BlueGrassLeaf() { }
 
-    public GrassLeaf(Vector3 position, float dailySeedGrowthChance, uint averageSeedSurvivalDays, uint maxSeedSurvivalVariation, Grass grass, float shadowAtPos, bool firstLeaf)
+    public BlueGrassLeaf(Vector3 position, float dailySeedGrowthChance, uint averageSeedSurvivalDays, uint maxSeedSurvivalVariation, BlueGrass BlueGrass, float shadowAtPos, bool firstLeaf)
     {
         ShadowAtLocation = shadowAtPos;
         Position = position;
 
         GameObject model = null;
-        GrassSeedState seedState = new GrassSeedState(model, dailySeedGrowthChance, Random.Range((int)(averageSeedSurvivalDays - maxSeedSurvivalVariation), (int)(averageSeedSurvivalDays + maxSeedSurvivalVariation + 1)), this, firstLeaf);
-        GrassGrowingState growingState = new GrassGrowingState(this);
-        GrassFullyGrownState fullyGrownState = new GrassFullyGrownState(this);
-        GrassDormantState dormantState = new GrassDormantState(this);
+        BlueGrassSeedState seedState = new BlueGrassSeedState(model, dailySeedGrowthChance, Random.Range((int)(averageSeedSurvivalDays - maxSeedSurvivalVariation), (int)(averageSeedSurvivalDays + maxSeedSurvivalVariation + 1)), this, firstLeaf);
+        BlueGrassGrowingState growingState = new BlueGrassGrowingState(this);
+        BlueGrassFullyGrownState fullyGrownState = new BlueGrassFullyGrownState(this);
+        BlueGrassDormantState dormantState = new BlueGrassDormantState(this);
 
         StateTransition seedToGrowing = new StateTransition
             ((originObject, originState)
             =>
             {
-                if (!(originState as GrassSeedState).WillGrow) return StateTransitionResult.NO_ACTION;
+                if (!(originState as BlueGrassSeedState).WillGrow) return StateTransitionResult.NO_ACTION;
                 return StateTransitionResult.STACK_SWAP;
             });
         seedToGrowing.TargetState = growingState;
@@ -95,7 +95,7 @@ public class GrassLeaf
             ((originObject, originState)
             =>
             {
-                if (!(originState as GrassGrowingState).HasReachedTarget()) return StateTransitionResult.NO_ACTION;
+                if (!(originState as BlueGrassGrowingState).HasReachedTarget()) return StateTransitionResult.NO_ACTION;
                 return StateTransitionResult.STACK_SWAP;
             });
         growingToGrown.TargetState = fullyGrownState;
@@ -124,19 +124,19 @@ public class GrassLeaf
         dormantState.Transitions.Add(leaveDormancy);
 
 
-        _stateMachine = new StateMachine(grass, seedState);
+        _stateMachine = new StateMachine(BlueGrass, seedState);
     }
 
-    public GrassLeaf(Vector3 position, float dailySeedGrowthChance, uint averageSeedSurvivalDays, uint maxSeedSurvivalVariation, Grass grass, bool firstLeaf)
-        : this(position, dailySeedGrowthChance, averageSeedSurvivalDays, maxSeedSurvivalVariation, grass, grass.gameObject.GetComponent<Plant>().ShadowFactor, firstLeaf)
-    {}
+    public BlueGrassLeaf(Vector3 position, float dailySeedGrowthChance, uint averageSeedSurvivalDays, uint maxSeedSurvivalVariation, BlueGrass BlueGrass, bool firstLeaf)
+        : this(position, dailySeedGrowthChance, averageSeedSurvivalDays, maxSeedSurvivalVariation, BlueGrass, BlueGrass.gameObject.GetComponent<Plant>().ShadowFactor, firstLeaf)
+    { }
 
     public void Update()
     {
         _stateMachine.Update();
     }
-    
-    public void AddConnection(GrassConnection connection)
+
+    public void AddConnection(BlueGrassConnection connection)
     {
         _connections.Add(connection);
     }
@@ -145,14 +145,14 @@ public class GrassLeaf
     public float ShadowAtLocation { get; private set; } = 0f;
     public GameObject CurrentModel { get; set; } = null;
 
-    private List<GrassConnection> _connections = new List<GrassConnection>();
+    private List<BlueGrassConnection> _connections = new List<BlueGrassConnection>();
     private StateMachine _stateMachine = null;
 }
 
-public class GrassConnection
+public class BlueGrassConnection
 {
-    private GrassConnection() { }
-    public GrassConnection(GrassLeaf initiator, GrassLeaf receiver)
+    private BlueGrassConnection() { }
+    public BlueGrassConnection(BlueGrassLeaf initiator, BlueGrassLeaf receiver)
     {
         initiator.AddConnection(this);
         receiver.AddConnection(this);
@@ -161,20 +161,20 @@ public class GrassConnection
 
 namespace VegetationStates
 {
-    public class GrassSeedState : State
+    public class BlueGrassSeedState : State
     {
         public bool WillGrow { get; private set; } = false;
         private float _spawnOddsPerDay = 0f;
         private int _survivalDaysLeft = 0;
         private GameObject _model = null;
-        private GrassLeaf _leaf = null;
+        private BlueGrassLeaf _leaf = null;
         private bool _firstSeed = true;
 
-        private GrassSeedState() { }
-        public GrassSeedState(GameObject model, float spawnOddsPerDay, int maxSurvivalDays, GrassLeaf leaf, bool firstSeed)
+        private BlueGrassSeedState() { }
+        public BlueGrassSeedState(GameObject model, float spawnOddsPerDay, int maxSurvivalDays, BlueGrassLeaf leaf, bool firstSeed)
         {
             _model = model;
-            _spawnOddsPerDay = spawnOddsPerDay * Mathf.Clamp((1 - leaf.ShadowAtLocation), 0.25f, 1f);
+            _spawnOddsPerDay = spawnOddsPerDay * Mathf.Clamp(leaf.ShadowAtLocation * 0.9f, 0.25f, 1f);
             _survivalDaysLeft = maxSurvivalDays;
             _leaf = leaf;
             _firstSeed = firstSeed;
@@ -196,11 +196,11 @@ namespace VegetationStates
             if (WillGrow)
             {
                 if (!_firstSeed) return;
-                
+
                 Plant plant = origin.GetComponent<Plant>();
                 if (!plant.VegetationSys.AttemptOccupy(origin.transform.position, plant))
                 {
-                    (origin as Grass).DeregisterLeaf(_leaf);
+                    (origin as BlueGrass).DeregisterLeaf(_leaf);
                     Object.Destroy(_model);
                 }
                 return;
@@ -208,19 +208,19 @@ namespace VegetationStates
 
             if (--_survivalDaysLeft == 0)
             {
-                (origin as Grass).DeregisterLeaf(_leaf);
+                (origin as BlueGrass).DeregisterLeaf(_leaf);
                 Object.Destroy(_model);
             }
         }
     }
 
-    public class GrassGrowingState : State
+    public class BlueGrassGrowingState : State
     {
-        private GrassGrowingState() { }
-        public GrassGrowingState(GrassLeaf leaf)
+        private BlueGrassGrowingState() { }
+        public BlueGrassGrowingState(BlueGrassLeaf leaf)
         {
             _leaf = leaf;
-            _chanceToSpawn *= (1f - leaf.ShadowAtLocation) * 0.5f + 0.5f;
+            _chanceToSpawn *= leaf.ShadowAtLocation * 0.9f * 0.5f + 0.5f;
         }
 
         public bool HasReachedTarget() { return _leaf.CurrentModel.transform.localScale.y > _maxScale; }
@@ -228,22 +228,22 @@ namespace VegetationStates
         private float _maxScale = Random.Range(0.9f, 1.1f);
         private float _distanceSpawned = 0.5f;
         private Vector3 _initialScale = new Vector3(0.1f, 0.1f, 0.1f);
-        private Vector3 _amountAddedPerDay = new Vector3(0.000f, 0.002f, 0.000f);
-        private GrassLeaf _leaf = null;
+        private Vector3 _amountAddedPerDay = new Vector3(0.000f, 0.0025f, 0.000f);
+        private BlueGrassLeaf _leaf = null;
 
         public override void Enter(MonoBehaviour origin)
         {
-            Grass grass = origin as Grass;
-            _leaf.CurrentModel = Object.Instantiate(grass.GetLeafModel(), _leaf.Position, grass.GetLeafModel().transform.rotation, grass.transform);
+            BlueGrass BlueGrass = origin as BlueGrass;
+            _leaf.CurrentModel = Object.Instantiate(BlueGrass.GetLeafModel(), _leaf.Position, BlueGrass.GetLeafModel().transform.rotation, BlueGrass.transform);
             _initialScale = _leaf.CurrentModel.transform.localScale;
 
             Mesh mesh = _leaf.CurrentModel.GetComponentInChildren<MeshFilter>().mesh;
             Vector3[] vertices = mesh.vertices;
             Color32[] colours = new Color32[vertices.Length];
-            
+
             for (int i = 0, length = vertices.Length; i < length; i += 10)
             {
-                byte value = (byte)((((float)i / length) < _leaf.ShadowAtLocation) ? 255 : 0);
+                byte value = (byte)((((float)i / length) > _leaf.ShadowAtLocation) ? 255 : 0);
                 Color32 colour = new Color32(value, value, value, value);
 
                 for (int j = 0; j < 10; ++j)
@@ -270,18 +270,18 @@ namespace VegetationStates
                 float randomAngle = Random.Range(0f, Mathf.PI * 2f);
                 targetPos += new Vector3(Mathf.Cos(randomAngle) * _distanceSpawned, 0f, Mathf.Sin(randomAngle) * _distanceSpawned);
                 targetPos.y += 2.5f * Random.Range(-1f, 1f);
-                (origin as Grass).AddGrassToSystem(targetPos, _leaf.Position);
+                (origin as BlueGrass).AddBlueGrassToSystem(targetPos, _leaf.Position);
             }
         }
     }
 
-    public class GrassFullyGrownState : State
+    public class BlueGrassFullyGrownState : State
     {
-        private GrassLeaf _leaf = null;
+        private BlueGrassLeaf _leaf = null;
         private float _chanceToSpawn = 0.12f;
         private float _distanceSpawned = 0.5f;
 
-        public GrassFullyGrownState(GrassLeaf leaf) { _leaf = leaf; }
+        public BlueGrassFullyGrownState(BlueGrassLeaf leaf) { _leaf = leaf; }
 
         public override void Enter(MonoBehaviour origin) { }
 
@@ -294,18 +294,18 @@ namespace VegetationStates
                 Vector3 targetPos = _leaf.Position;
                 float randomAngle = Random.Range(0f, Mathf.PI * 2f);
                 targetPos += new Vector3(Mathf.Cos(randomAngle) * _distanceSpawned, 0f, Mathf.Sin(randomAngle) * _distanceSpawned);
-                (origin as Grass).AddGrassToSystem(targetPos, _leaf.Position);
+                (origin as BlueGrass).AddBlueGrassToSystem(targetPos, _leaf.Position);
             }
         }
     }
 
-    public class GrassDormantState : State
+    public class BlueGrassDormantState : State
     {
         private float _chanceToWither = 0.001f;
-        private GrassLeaf _leaf = null;
+        private BlueGrassLeaf _leaf = null;
 
-        private GrassDormantState() { }
-        public GrassDormantState(GrassLeaf leaf)
+        private BlueGrassDormantState() { }
+        public BlueGrassDormantState(BlueGrassLeaf leaf)
         {
             _leaf = leaf;
         }
@@ -323,7 +323,7 @@ namespace VegetationStates
         {
             if (Random.Range(0f, 1f) <= _chanceToWither)
             {
-                (origin as Grass).DeregisterLeaf(_leaf);
+                (origin as BlueGrass).DeregisterLeaf(_leaf);
                 Object.Destroy(_leaf.CurrentModel);
             }
         }

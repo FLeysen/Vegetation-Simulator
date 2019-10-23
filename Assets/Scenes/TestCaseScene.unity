@@ -148,7 +148,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 9
   m_Type: 1
-  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
+  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 0}
   m_Intensity: 0.33
   m_Range: 10
   m_SpotAngle: 30
@@ -1597,7 +1597,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _possiblePlantPrefabs:
   - {fileID: 2215387684197432118, guid: 4a2d7f4b297fde545ad8108844a180ea, type: 3}
-  _seedsBeforeStart: e8030000
+  - {fileID: 2215387684197432118, guid: ab3f09363f94e6b4d9d0e7923d6c34a4, type: 3}
+  - {fileID: 2215387684197432118, guid: 4463ad7f6693f9b47be33baec945b4a0, type: 3}
+  _seedsBeforeStart: 4d0100004d0100004d010000
 --- !u!156049354 &1592667137
 Grid:
   m_ObjectHideFlags: 0
