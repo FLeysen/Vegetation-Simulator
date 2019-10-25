@@ -1,0 +1,38 @@
+Journal
+Monday:
+The day of the presentation test run. I wasn't quite satisfied with the presentation yet, so I expanded on my script/guideline for the problematic segments (both case study slides - surfaces and shadows). Wanting to get it as good as possible with what I currently had, I went over it all many times. Presenting has historically been an area of many troubles for me, so I had to put in some hours of extra effort to make sure I was at the level I wanted for the real deal. The presentation happened, going quite well. I was happy with the result, got some feedback (more images/visualizations & move clarifications earlier) and immediately applied it. Throughout the day I kept looking for the optimization I wanted and by the end of the day found what I was looking for: a segment in a thesis about real-time realistic rendering of nature scenes with dynamic lighting.
+
+Tuesday:
+I made the preparations to apply the optimization I found. Quickly creating a model with texture to finally better represent intentions and not work one blade of grass at a time (this was also part of the solution). Since it requires a shader, I needed some extra time looking into the details of Unity's shaders to get to the point I wanted. It required some experimenting with vertex colours and figuring out how everything is linked together in that stage. The shaders took quite some time to get the hang of and appeared to not allow exactly what I was looking for. The rest of the day was spent attempting to create what I was looking for and got very close to a solution.
+
+Wednesday:
+Finally I managed to create something that was almost equal to the intended system of density-based rendering. I tore it through testing and found satisfaction in the result. With the research and case study elements of this segment done, I started writing on its paper and presentation parts. I couldn't really find the inspiration after having experienced quite enough of it and decided to first direct my attention towards creating some plant variations and look for something that's interesting and shows what can be done. Thus were finally born the red and blue grasses, red being identical to green (except for some minor value tweaks) and blue thriving in shadow as opposed to the others liking light. It was exciting to see everything in action, finally running at a good amount of fps and being able to go for tens of thousands of days, seeing how the colours change over time.
+
+Thursday:
+Coding test time! Ubisoft Berlin gave me a fun test that took a long time to complete. The time spent on this instead of gradwork will be caught up later.
+
+Friday:
+Back to the paperwork. I started over on the paper and presentation elements for the optimization segment. It's still tough to express exactly what I want to for this segment, but I'm getting through it. I spent much more time on the journal this time around after the feedback of it not being in depth enough.
+
+Next week:
+Add more plants with different rules and add a test case segment for it to the paper. Finish up all of the deliverables (paper, powerpoint, video) so the final two days before presentation can focus completely on preparation and making sure everything is correct/in order.
+
+========
+Supervisor notes
+The planned supervisor meeting could not happen this week, so following notes on the coach meeting and per-mail feedback
+Explain details sooner, prevent creating false expectations
+Journal more into depth
+More images/visualizations in presentation and paper
+Apply leho paper feedback
+
+========
+STARR Situation Task Action Result Reflection
+Situation: Test presentations are happening at the coaching session this week, with non-graded feedback, the only time to actually try out the presentation in a situation close to the real deal.
+
+Task: Give a presentation that is as close to the final presentation as possible and fulfills the requirements of the rubric as well as possible.
+
+Action: Spent a long time on writing a guideline script for the presentation and a matching powerpoint that is conform the rules of what the powerpoint should look like. Extra effort went into rehearsing as well as adapting the guideline script, since it's a point of difficulty for me.
+
+Result: I gave a presentation I am satisfied with without choking or any critical problems and got positive and helpful feedback.
+
+Reflection: Practice is king. The worst part of the presentation were some of the middle elements, where I wasn't confident enough to express myself without falling back to my monitor and notes. It went well overall, but improvements can be made, still.
