@@ -218,7 +218,13 @@ namespace VegetationStates
             TestPlant TestPlant = origin as TestPlant;
             _leaf.CurrentModel = Object.Instantiate(TestPlant.GetLeafModel(), _leaf.Position, TestPlant.GetLeafModel().transform.rotation, TestPlant.transform);
             _mesh = _leaf.CurrentModel.GetComponentInChildren<MeshFilter>().mesh;
-            _colours = _mesh.colors32;
+            Vector3[] vertices = _mesh.vertices;
+            _colours = new Color32[vertices.Length];
+
+            Color32 colour = new Color32(255, 255, 255, 255);
+            for (int i = 0, length = vertices.Length; i < length; ++i)
+                _colours[i] = colour;
+            _mesh.colors32 = _colours;
 
             Vector3 rotation = _leaf.CurrentModel.transform.localEulerAngles;
             rotation.y = Random.Range(0f, 359.9999f);
@@ -248,6 +254,7 @@ namespace VegetationStates
 
                     for (int i = 0, length = vertices.Length / 4, startPos = (3 - _absorbsUntilFullyGrown) * vertices.Length / 4; i < length; ++i)
                         _colours[i + startPos] = colour;
+                    _mesh.colors32 = _colours;
                 }
             }
         }
