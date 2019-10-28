@@ -244,9 +244,9 @@ namespace VegetationStates
                     --_absorbsUntilFullyGrown;
 
                     Vector3[] vertices = _mesh.vertices;
-                    Color32 colour = new Color32(255, 255, 255, 255);
+                    Color32 colour = new Color32(0, 0, 0, 0);
 
-                    for (int i = 0, length = vertices.Length / 4, startPos = (4 - _absorbsUntilFullyGrown) * vertices.Length / 4; i < length; ++i)
+                    for (int i = 0, length = vertices.Length / 4, startPos = (3 - _absorbsUntilFullyGrown) * vertices.Length / 4; i < length; ++i)
                         _colours[i + startPos] = colour;
                 }
             }
