@@ -2,7 +2,7 @@
 using VegetationStates;
 using System.Collections.Generic;
 
-public class Grass : MonoBehaviour, IActOnDayPassing
+public class Grass : MonoBehaviour, IActOnDayPassing, IActOnAttemptDestroy 
 {
     [SerializeField] [Range(0.001f, 1f)] private float _dailySeedGrowthChance = 0.01f;
     [SerializeField] private uint _averageSeedSurvivalDays = 17;
@@ -62,6 +62,17 @@ public class Grass : MonoBehaviour, IActOnDayPassing
         {
             plant.VegetationSys.RemoveOccupationsBy(plant);
             Destroy(transform.parent.gameObject);
+        }
+    }
+
+    public void OnAttemptDestroy(Vector3Int pos)
+    {
+        Grid grid = GetComponent<Plant>().VegetationSys.GetComponent<Grid>();
+        foreach (GrassLeaf leaf in _grassSystem)
+        {
+            if (grid.WorldToCell(leaf.Position) != pos) continue;
+            DeregisterLeaf(leaf);
+            return;
         }
     }
 }

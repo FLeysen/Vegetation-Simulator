@@ -176,6 +176,14 @@ public class VegetationSystem : MonoBehaviour
             _gridOccupations[key] = null;
     }
 
+    public Plant GetOccupationNear(Vector3 position, ref Vector3Int direction)
+    {
+        direction = _grid.WorldToCell(position) + direction;
+        if (_gridOccupations.ContainsKey(direction))
+            return _gridOccupations[direction];
+        return null;
+    }
+
     private void OnDayPassed()
     {
         foreach(Plant plant in _plants)

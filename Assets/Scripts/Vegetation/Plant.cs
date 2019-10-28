@@ -5,6 +5,11 @@ public interface IActOnDayPassing
     void OnDayPassed();
 }
 
+public interface IActOnAttemptDestroy
+{
+    void OnAttemptDestroy(Vector3Int pos);
+}
+
 public class Plant : MonoBehaviour
 {
     public VegetationSystem VegetationSys { get; set; } = null;
@@ -12,6 +17,7 @@ public class Plant : MonoBehaviour
     public float LifeForce = 1f;
 
     private IActOnDayPassing[] _actOnDayPassingBehaviours = new IActOnDayPassing[] { };
+    private IActOnAttemptDestroy[] _actOnAttemptDestroyBehaviours = new IActOnAttemptDestroy[] { };
 
     private void OnDestroy()
     {
@@ -21,11 +27,18 @@ public class Plant : MonoBehaviour
     private void Start()
     {
         _actOnDayPassingBehaviours = GetComponents<IActOnDayPassing>();
+        _actOnAttemptDestroyBehaviours = GetComponents<IActOnAttemptDestroy>();
     }
 
     public void OnDayPassed()
     {
         foreach(IActOnDayPassing actingBehaviour in _actOnDayPassingBehaviours)
             actingBehaviour.OnDayPassed();
+    }
+
+    public void OnAttemptDestroy(Vector3Int pos)
+    {
+        foreach (IActOnAttemptDestroy actingBehaviour in _actOnAttemptDestroyBehaviours)
+            actingBehaviour.OnAttemptDestroy(pos);
     }
 }
