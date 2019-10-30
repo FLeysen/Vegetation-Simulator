@@ -33,7 +33,7 @@ public class Grass : MonoBehaviour, IActOnDayPassing, IActOnAttemptDestroy
     public void AddGrassToSystem(Vector3 pos, Vector3 creatorPos)
     {
         Plant plant = GetComponent<Plant>();
-        if(plant.VegetationSys.AttemptHardOccupy(ref pos, plant, out float shadowFactor))
+        if(plant.VegetationSys.AttemptHardOccupy(ref pos, creatorPos, plant, out float shadowFactor))
         {
             _grassSystem.Add(new GrassLeaf(pos, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, shadowFactor, false));
         }
@@ -51,12 +51,12 @@ public class Grass : MonoBehaviour, IActOnDayPassing, IActOnAttemptDestroy
         _removeBuffer.Clear();
     }
 
-    public void DeregisterLeaf(GrassLeaf leaf)
+    public void DeregisterLeaf(GrassLeaf leaf, bool removeOccupation)
     {
         _removeBuffer.Add(leaf);
 
         Plant plant = GetComponent<Plant>();
-        plant.VegetationSys.RemoveOccupationAt(leaf.Position);
+        if(removeOccupation) plant.VegetationSys.RemoveOccupationAt(leaf.Position);
 
         if (_grassSystem.Count == _removeBuffer.Count)
         {
@@ -71,7 +71,7 @@ public class Grass : MonoBehaviour, IActOnDayPassing, IActOnAttemptDestroy
         foreach (GrassLeaf leaf in _grassSystem)
         {
             if (grid.WorldToCell(leaf.Position) != pos) continue;
-            DeregisterLeaf(leaf);
+            DeregisterLeaf(leaf, false);
             return;
         }
     }
@@ -211,7 +211,7 @@ namespace VegetationStates
                 Plant plant = origin.GetComponent<Plant>();
                 if (!plant.VegetationSys.AttemptOccupy(origin.transform.position, plant))
                 {
-                    (origin as Grass).DeregisterLeaf(_leaf);
+                    (origin as Grass).DeregisterLeaf(_leaf, false);
                     Object.Destroy(_model);
                 }
                 return;
@@ -219,7 +219,7 @@ namespace VegetationStates
 
             if (--_survivalDaysLeft == 0)
             {
-                (origin as Grass).DeregisterLeaf(_leaf);
+                (origin as Grass).DeregisterLeaf(_leaf, !_firstSeed);
                 Object.Destroy(_model);
             }
         }
@@ -334,7 +334,7 @@ namespace VegetationStates
         {
             if (Random.Range(0f, 1f) <= _chanceToWither)
             {
-                (origin as Grass).DeregisterLeaf(_leaf);
+                (origin as Grass).DeregisterLeaf(_leaf, true);
                 Object.Destroy(_leaf.CurrentModel);
             }
         }

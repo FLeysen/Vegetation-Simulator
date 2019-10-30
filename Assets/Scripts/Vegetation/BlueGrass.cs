@@ -2,18 +2,18 @@
 using VegetationStates;
 using System.Collections.Generic;
 
-public class BlueGrass : MonoBehaviour, IActOnDayPassing
+public class BlueGrass : MonoBehaviour, IActOnDayPassing, IActOnAttemptDestroy
 {
     [SerializeField] [Range(0.001f, 1f)] private float _dailySeedGrowthChance = 0.01f;
     [SerializeField] private uint _averageSeedSurvivalDays = 17;
     [SerializeField] private uint _maxSeedSurvivalVariation = 12;
     [SerializeField] private GameObject _leafModel = null;
 
-    private List<BlueGrassLeaf> _BlueGrassSystem = new List<BlueGrassLeaf>();
+    private List<BlueGrassLeaf> _blueGrassSystem = new List<BlueGrassLeaf>();
     private List<BlueGrassLeaf> _removables = new List<BlueGrassLeaf>();
     private List<BlueGrassLeaf> _removeBuffer = new List<BlueGrassLeaf>();
 
-    public int GetLeafCount() { return _BlueGrassSystem.Count; }
+    public int GetLeafCount() { return _blueGrassSystem.Count; }
     public GameObject GetLeafModel() { return _leafModel; }
 
     private void OnValidate()
@@ -27,41 +27,52 @@ public class BlueGrass : MonoBehaviour, IActOnDayPassing
 
     private void Start()
     {
-        _BlueGrassSystem.Add(new BlueGrassLeaf(transform.position, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, true));
+        _blueGrassSystem.Add(new BlueGrassLeaf(transform.position, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, true));
     }
 
     public void AddBlueGrassToSystem(Vector3 pos, Vector3 creatorPos)
     {
         Plant plant = GetComponent<Plant>();
-        if (plant.VegetationSys.AttemptHardOccupy(ref pos, plant, out float shadowFactor))
+        if (plant.VegetationSys.AttemptHardOccupy(ref pos, creatorPos, plant, out float shadowFactor))
         {
-            _BlueGrassSystem.Add(new BlueGrassLeaf(pos, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, shadowFactor, false));
+            _blueGrassSystem.Add(new BlueGrassLeaf(pos, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, shadowFactor, false));
         }
     }
 
     public void OnDayPassed()
     {
-        for (int i = 0, size = _BlueGrassSystem.Count; i < size; ++i)
-            _BlueGrassSystem[i].Update();
+        for (int i = 0, size = _blueGrassSystem.Count; i < size; ++i)
+            _blueGrassSystem[i].Update();
 
         foreach (BlueGrassLeaf leaf in _removables)
-            _BlueGrassSystem.Remove(leaf);
+            _blueGrassSystem.Remove(leaf);
 
         _removables = _removeBuffer;
         _removeBuffer.Clear();
     }
 
-    public void DeregisterLeaf(BlueGrassLeaf leaf)
+    public void DeregisterLeaf(BlueGrassLeaf leaf, bool removeOccupation)
     {
         _removeBuffer.Add(leaf);
 
         Plant plant = GetComponent<Plant>();
-        plant.VegetationSys.RemoveOccupationAt(leaf.Position);
+        if(removeOccupation) plant.VegetationSys.RemoveOccupationAt(leaf.Position);
 
-        if (_BlueGrassSystem.Count == _removeBuffer.Count)
+        if (_blueGrassSystem.Count == _removeBuffer.Count)
         {
             plant.VegetationSys.RemoveOccupationsBy(plant);
             Destroy(transform.parent.gameObject);
+        }
+    }
+
+    public void OnAttemptDestroy(Vector3Int pos)
+    {
+        Grid grid = GetComponent<Plant>().VegetationSys.GetComponent<Grid>();
+        foreach (BlueGrassLeaf leaf in _blueGrassSystem)
+        {
+            if (grid.WorldToCell(leaf.Position) != pos) continue;
+            DeregisterLeaf(leaf, false);
+            return;
         }
     }
 }
@@ -200,7 +211,7 @@ namespace VegetationStates
                 Plant plant = origin.GetComponent<Plant>();
                 if (!plant.VegetationSys.AttemptOccupy(origin.transform.position, plant))
                 {
-                    (origin as BlueGrass).DeregisterLeaf(_leaf);
+                    (origin as BlueGrass).DeregisterLeaf(_leaf, false);
                     Object.Destroy(_model);
                 }
                 return;
@@ -208,7 +219,7 @@ namespace VegetationStates
 
             if (--_survivalDaysLeft == 0)
             {
-                (origin as BlueGrass).DeregisterLeaf(_leaf);
+                (origin as BlueGrass).DeregisterLeaf(_leaf, !_firstSeed);
                 Object.Destroy(_model);
             }
         }
@@ -323,7 +334,7 @@ namespace VegetationStates
         {
             if (Random.Range(0f, 1f) <= _chanceToWither)
             {
-                (origin as BlueGrass).DeregisterLeaf(_leaf);
+                (origin as BlueGrass).DeregisterLeaf(_leaf, true);
                 Object.Destroy(_leaf.CurrentModel);
             }
         }

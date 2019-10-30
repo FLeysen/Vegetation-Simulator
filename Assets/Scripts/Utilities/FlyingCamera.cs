@@ -25,8 +25,59 @@ public class FlyingCamera : MonoBehaviour
     private float _yRotation = 0f;
     private bool _isKeyHeld = false;
 
+    private GameObject[] _positionHolders = new GameObject[5] { null, null, null, null, null };
+
+    private void Start()
+    {
+        GameObject go = new GameObject("CameraPositionHolder");
+        for (int i = 0, length = _positionHolders.Length ; i < length; ++i)
+            _positionHolders[i] = Instantiate(go);
+    }
+
     void Update()
     {
+#region checkpoints
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            if (Input.GetKey(KeyCode.LeftShift))
+                _positionHolders[0].transform.SetPositionAndRotation(transform.position, transform.rotation);
+            else
+                transform.SetPositionAndRotation(_positionHolders[0].transform.position, _positionHolders[0].transform.rotation);
+        }
+
+        else if (Input.GetKeyDown(KeyCode.F2))
+        {
+            if (Input.GetKey(KeyCode.LeftShift))
+                _positionHolders[1].transform.SetPositionAndRotation(transform.position, transform.rotation);
+            else
+                transform.SetPositionAndRotation(_positionHolders[1].transform.position, _positionHolders[1].transform.rotation);
+        }
+
+        else if (Input.GetKeyDown(KeyCode.F3))
+        {
+            if (Input.GetKey(KeyCode.LeftShift))
+                _positionHolders[2].transform.SetPositionAndRotation(transform.position, transform.rotation);
+            else
+                transform.SetPositionAndRotation(_positionHolders[2].transform.position, _positionHolders[2].transform.rotation);
+        }
+
+        else if (Input.GetKeyDown(KeyCode.F4))
+        {
+            if (Input.GetKey(KeyCode.LeftShift))
+                _positionHolders[3].transform.SetPositionAndRotation(transform.position, transform.rotation);
+            else
+                transform.SetPositionAndRotation(_positionHolders[3].transform.position, _positionHolders[3].transform.rotation);
+        }
+
+        else if (Input.GetKeyDown(KeyCode.F5))
+        {
+            if (Input.GetKey(KeyCode.LeftShift))
+                _positionHolders[4].transform.SetPositionAndRotation(transform.position, transform.rotation);
+            else
+                transform.SetPositionAndRotation(_positionHolders[4].transform.position, _positionHolders[4].transform.rotation);
+        }
+#endregion
+
         if (!_isKeyHeld)
         {
             if (Input.GetKeyDown(_holdToMoveButton))

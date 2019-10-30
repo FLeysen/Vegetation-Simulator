@@ -9,11 +9,11 @@ public class TestPlant : MonoBehaviour, IActOnDayPassing
     [SerializeField] private uint _maxSeedSurvivalVariation = 12;
     [SerializeField] private GameObject _leafModel = null;
 
-    private List<TestPlantLeaf> _TestPlantSystem = new List<TestPlantLeaf>();
+    private List<TestPlantLeaf> _testPlantSystem = new List<TestPlantLeaf>();
     private List<TestPlantLeaf> _removables = new List<TestPlantLeaf>();
     private List<TestPlantLeaf> _removeBuffer = new List<TestPlantLeaf>();
 
-    public int GetLeafCount() { return _TestPlantSystem.Count; }
+    public int GetLeafCount() { return _testPlantSystem.Count; }
     public GameObject GetLeafModel() { return _leafModel; }
 
     private void OnValidate()
@@ -27,38 +27,34 @@ public class TestPlant : MonoBehaviour, IActOnDayPassing
 
     private void Start()
     {
-        _TestPlantSystem.Add(new TestPlantLeaf(transform.position, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, true));
+        _testPlantSystem.Add(new TestPlantLeaf(transform.position, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, true));
     }
 
     public void AddTestPlantToSystem(Vector3 pos, Vector3 creatorPos)
     {
-        Plant plant = GetComponent<Plant>();
-        if(plant.VegetationSys.AttemptHardOccupy(ref pos, plant, out float shadowFactor))
-        {
-            _TestPlantSystem.Add(new TestPlantLeaf(pos, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, shadowFactor, false));
-        }
+        _testPlantSystem.Add(new TestPlantLeaf(pos, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, false));
     }
 
     public void OnDayPassed()
     {
-        for (int i = 0, size = _TestPlantSystem.Count; i < size; ++i)
-            _TestPlantSystem[i].Update();
+        for (int i = 0, size = _testPlantSystem.Count; i < size; ++i)
+            _testPlantSystem[i].Update();
 
         foreach(TestPlantLeaf leaf in _removables)
-            _TestPlantSystem.Remove(leaf);
+            _testPlantSystem.Remove(leaf);
 
         _removables = _removeBuffer;
         _removeBuffer.Clear();
     }
 
-    public void DeregisterLeaf(TestPlantLeaf leaf)
+    public void DeregisterLeaf(TestPlantLeaf leaf, bool freePosition)
     {
         _removeBuffer.Add(leaf);
 
         Plant plant = GetComponent<Plant>();
-        plant.VegetationSys.RemoveOccupationAt(leaf.Position);
+        if(freePosition) plant.VegetationSys.RemoveOccupationAt(leaf.Position);
 
-        if (_TestPlantSystem.Count == _removeBuffer.Count)
+        if (_testPlantSystem.Count == _removeBuffer.Count)
         {
             plant.VegetationSys.RemoveOccupationsBy(plant);
             Destroy(transform.parent.gameObject);
@@ -158,7 +154,7 @@ namespace VegetationStates
         public TestPlantSeedState(GameObject model, float spawnOddsPerDay, int maxSurvivalDays, TestPlantLeaf leaf, bool firstSeed)
         {
             _model = model;
-            _spawnOddsPerDay = spawnOddsPerDay * Mathf.Clamp((1 - leaf.ShadowAtLocation), 0.25f, 1f);
+            _spawnOddsPerDay = spawnOddsPerDay;
             _survivalDaysLeft = maxSurvivalDays;
             _leaf = leaf;
             _firstSeed = firstSeed;
@@ -179,12 +175,24 @@ namespace VegetationStates
             WillGrow = WillGrow || (Random.value <= _spawnOddsPerDay);
             if (WillGrow)
             {
-                if (!_firstSeed) return;
-                
-                Plant plant = origin.GetComponent<Plant>();
+                Vector3Int dir = Vector3Int.zero;
+                TestPlant originPlant = (origin as TestPlant);
+                Plant plant = originPlant.GetComponent<Plant>();
+                Plant hit = plant.VegetationSys.GetOccupationNear(_leaf.Position, ref dir);
+
+                if (hit)
+                {
+                    if (hit.GetComponent<TestPlant>() != null)
+                    {
+                        originPlant.DeregisterLeaf(_leaf, false);
+                        Object.Destroy(_model);
+                        return;
+                    }
+                    hit.OnAttemptDestroy(dir);
+                }                
                 if (!plant.VegetationSys.AttemptOccupy(origin.transform.position, plant))
                 {
-                    (origin as TestPlant).DeregisterLeaf(_leaf);
+                    originPlant.DeregisterLeaf(_leaf, false);
                     Object.Destroy(_model);
                 }
                 return;
@@ -192,7 +200,7 @@ namespace VegetationStates
 
             if (--_survivalDaysLeft == 0)
             {
-                (origin as TestPlant).DeregisterLeaf(_leaf);
+                (origin as TestPlant).DeregisterLeaf(_leaf, false);
                 Object.Destroy(_model);
             }
         }
@@ -245,7 +253,7 @@ namespace VegetationStates
 
                 if (hit)
                 {
-                    if (hit.GetComponent<TestPlant>() == null) return;
+                    if (hit.GetComponent<TestPlant>() != null) return;
                     hit.OnAttemptDestroy(dir);
                     --_absorbsUntilFullyGrown;
 
@@ -263,6 +271,9 @@ namespace VegetationStates
     public class TestPlantFullyGrownState : State
     {
         private TestPlantLeaf _leaf = null;
+        private float _chanceToSpawn = 0.10f;
+        private float _distanceSpawned = 0.5f;
+        private int _amountSpawned = 100;
 
         public TestPlantFullyGrownState(TestPlantLeaf leaf) { _leaf = leaf; }
 
@@ -272,6 +283,17 @@ namespace VegetationStates
 
         public override void Update(MonoBehaviour origin)
         {
+            if (Random.Range(0f, 1f) <= _chanceToSpawn)
+            {
+                Vector3 targetPos = _leaf.Position;
+                float randomAngle = Random.Range(0f, Mathf.PI * 2f);
+                targetPos += new Vector3(Mathf.Cos(randomAngle) * _distanceSpawned, 0f, Mathf.Sin(randomAngle) * _distanceSpawned);
+                TestPlant plant = origin as TestPlant;
+                plant.AddTestPlantToSystem(targetPos, _leaf.Position);
+
+                if (--_amountSpawned == 0)
+                    plant.DeregisterLeaf(_leaf, true);
+            }
         }
     }
 
