@@ -254,7 +254,7 @@ namespace VegetationStates
 
             for (int i = 0, length = vertices.Length; i < length; i += 10)
             {
-                byte value = (byte)((((float)i / length) > _leaf.ShadowAtLocation) ? 255 : 0);
+                byte value = (byte)(((i * 1.5f / length) < _leaf.ShadowAtLocation) ? 255 : 0);
                 Color32 colour = new Color32(value, value, value, value);
 
                 for (int j = 0; j < 10; ++j)
