@@ -2,145 +2,145 @@
 using VegetationStates;
 using System.Collections.Generic;
 
-public class TestPlant : MonoBehaviour, IActOnDayPassing
+namespace VegetationGenerator
 {
-    [SerializeField] [Range(0.001f, 1f)] private float _dailySeedGrowthChance = 0.01f;
-    [SerializeField] private uint _averageSeedSurvivalDays = 17;
-    [SerializeField] private uint _maxSeedSurvivalVariation = 12;
-    [SerializeField] private GameObject _leafModel = null;
-
-    private List<TestPlantLeaf> _testPlantSystem = new List<TestPlantLeaf>();
-    private List<TestPlantLeaf> _removables = new List<TestPlantLeaf>();
-    private List<TestPlantLeaf> _removeBuffer = new List<TestPlantLeaf>();
-
-    public int GetLeafCount() { return _testPlantSystem.Count; }
-    public GameObject GetLeafModel() { return _leafModel; }
-
-    private void OnValidate()
+    public class TestPlant : MonoBehaviour, IActOnDayPassing
     {
-        if (_maxSeedSurvivalVariation >= _averageSeedSurvivalDays)
+        [SerializeField] [Range(0.001f, 1f)] private float _dailySeedGrowthChance = 0.01f;
+        [SerializeField] private uint _averageSeedSurvivalDays = 17;
+        [SerializeField] private uint _maxSeedSurvivalVariation = 12;
+        [SerializeField] private GameObject _leafModel = null;
+
+        private List<TestPlantLeaf> _testPlantSystem = new List<TestPlantLeaf>();
+        private List<TestPlantLeaf> _removables = new List<TestPlantLeaf>();
+        private List<TestPlantLeaf> _removeBuffer = new List<TestPlantLeaf>();
+
+        public int GetLeafCount() { return _testPlantSystem.Count; }
+        public GameObject GetLeafModel() { return _leafModel; }
+
+        private void OnValidate()
         {
-            Debug.LogWarning("Situations where seed would survive less than 1 day are not allowed.");
-            _averageSeedSurvivalDays += _maxSeedSurvivalVariation - _averageSeedSurvivalDays + 1;
+            if (_maxSeedSurvivalVariation >= _averageSeedSurvivalDays)
+            {
+                Debug.LogWarning("Situations where seed would survive less than 1 day are not allowed.");
+                _averageSeedSurvivalDays += _maxSeedSurvivalVariation - _averageSeedSurvivalDays + 1;
+            }
+        }
+
+        private void Start()
+        {
+            _testPlantSystem.Add(new TestPlantLeaf(transform.position, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, true));
+        }
+
+        public void AddTestPlantToSystem(Vector3 pos, Vector3 creatorPos)
+        {
+            _testPlantSystem.Add(new TestPlantLeaf(pos, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, false));
+        }
+
+        public void OnDayPassed()
+        {
+            for (int i = 0, size = _testPlantSystem.Count; i < size; ++i)
+                _testPlantSystem[i].Update();
+
+            foreach (TestPlantLeaf leaf in _removables)
+                _testPlantSystem.Remove(leaf);
+
+            _removables = _removeBuffer;
+            _removeBuffer.Clear();
+        }
+
+        public void DeregisterLeaf(TestPlantLeaf leaf, bool freePosition)
+        {
+            _removeBuffer.Add(leaf);
+
+            Plant plant = GetComponent<Plant>();
+            if (freePosition) plant.VegetationSys.RemoveOccupationAt(leaf.Position);
+
+            if (_testPlantSystem.Count == _removeBuffer.Count)
+            {
+                plant.VegetationSys.RemoveOccupationsBy(plant);
+                Destroy(transform.parent.gameObject);
+            }
         }
     }
 
-    private void Start()
+    public class TestPlantLeaf
     {
-        _testPlantSystem.Add(new TestPlantLeaf(transform.position, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, true));
-    }
+        private TestPlantLeaf() { }
 
-    public void AddTestPlantToSystem(Vector3 pos, Vector3 creatorPos)
-    {
-        _testPlantSystem.Add(new TestPlantLeaf(pos, _dailySeedGrowthChance, _averageSeedSurvivalDays, _maxSeedSurvivalVariation, this, false));
-    }
-
-    public void OnDayPassed()
-    {
-        for (int i = 0, size = _testPlantSystem.Count; i < size; ++i)
-            _testPlantSystem[i].Update();
-
-        foreach(TestPlantLeaf leaf in _removables)
-            _testPlantSystem.Remove(leaf);
-
-        _removables = _removeBuffer;
-        _removeBuffer.Clear();
-    }
-
-    public void DeregisterLeaf(TestPlantLeaf leaf, bool freePosition)
-    {
-        _removeBuffer.Add(leaf);
-
-        Plant plant = GetComponent<Plant>();
-        if(freePosition) plant.VegetationSys.RemoveOccupationAt(leaf.Position);
-
-        if (_testPlantSystem.Count == _removeBuffer.Count)
+        public TestPlantLeaf(Vector3 position, float dailySeedGrowthChance, uint averageSeedSurvivalDays, uint maxSeedSurvivalVariation, TestPlant TestPlant, float shadowAtPos, bool firstLeaf)
         {
-            plant.VegetationSys.RemoveOccupationsBy(plant);
-            Destroy(transform.parent.gameObject);
+            ShadowAtLocation = shadowAtPos;
+            Position = position;
+
+            GameObject model = null;
+            TestPlantSeedState seedState = new TestPlantSeedState(model, dailySeedGrowthChance, Random.Range((int)(averageSeedSurvivalDays - maxSeedSurvivalVariation), (int)(averageSeedSurvivalDays + maxSeedSurvivalVariation + 1)), this, firstLeaf);
+            TestPlantGrowingState growingState = new TestPlantGrowingState(this);
+            TestPlantFullyGrownState fullyGrownState = new TestPlantFullyGrownState(this);
+            TestPlantDormantState dormantState = new TestPlantDormantState(this);
+
+            StateTransition seedToGrowing = new StateTransition
+                ((originObject, originState)
+                =>
+                {
+                    if (!(originState as TestPlantSeedState).WillGrow) return StateTransitionResult.NO_ACTION;
+                    return StateTransitionResult.STACK_SWAP;
+                });
+            seedToGrowing.TargetState = growingState;
+            seedState.Transitions.Add(seedToGrowing);
+
+            StateTransition growingToGrown = new StateTransition
+                ((originObject, originState)
+                =>
+                {
+                    if (!(originState as TestPlantGrowingState).HasReachedTarget()) return StateTransitionResult.NO_ACTION;
+                    return StateTransitionResult.STACK_SWAP;
+                });
+            growingToGrown.TargetState = fullyGrownState;
+            growingState.Transitions.Add(growingToGrown);
+
+            StateTransition toDormant = new StateTransition
+                ((originObject, originState)
+                =>
+                {
+                    if (SeasonChanger.Instance.GetSeason() == Season.Autumn) return StateTransitionResult.NO_ACTION;
+                    return StateTransitionResult.STACK_PUSH;
+                });
+            toDormant.TargetState = dormantState;
+            growingState.Transitions.Add(toDormant);
+            fullyGrownState.Transitions.Add(toDormant);
+            seedState.Transitions.Add(toDormant);
+
+            StateTransition leaveDormancy = new StateTransition
+                ((originObject, originState)
+                =>
+                {
+                    if (SeasonChanger.Instance.GetSeason() != Season.Autumn) return StateTransitionResult.NO_ACTION;
+                    return StateTransitionResult.STACK_POP;
+                });
+            leaveDormancy.TargetState = null;
+            dormantState.Transitions.Add(leaveDormancy);
+
+
+            _stateMachine = new StateMachine(TestPlant, seedState);
         }
-    }
-}
 
-public class TestPlantLeaf
-{
-    private TestPlantLeaf() { }
+        public TestPlantLeaf(Vector3 position, float dailySeedGrowthChance, uint averageSeedSurvivalDays, uint maxSeedSurvivalVariation, TestPlant TestPlant, bool firstLeaf)
+            : this(position, dailySeedGrowthChance, averageSeedSurvivalDays, maxSeedSurvivalVariation, TestPlant, TestPlant.gameObject.GetComponent<Plant>().ShadowFactor, firstLeaf)
+        { }
 
-    public TestPlantLeaf(Vector3 position, float dailySeedGrowthChance, uint averageSeedSurvivalDays, uint maxSeedSurvivalVariation, TestPlant TestPlant, float shadowAtPos, bool firstLeaf)
-    {
-        ShadowAtLocation = shadowAtPos;
-        Position = position;
+        public void Update()
+        {
+            _stateMachine.Update();
+        }
 
-        GameObject model = null;
-        TestPlantSeedState seedState = new TestPlantSeedState(model, dailySeedGrowthChance, Random.Range((int)(averageSeedSurvivalDays - maxSeedSurvivalVariation), (int)(averageSeedSurvivalDays + maxSeedSurvivalVariation + 1)), this, firstLeaf);
-        TestPlantGrowingState growingState = new TestPlantGrowingState(this);
-        TestPlantFullyGrownState fullyGrownState = new TestPlantFullyGrownState(this);
-        TestPlantDormantState dormantState = new TestPlantDormantState(this);
+        public Vector3 Position { get; private set; } = Vector3.zero;
+        public float ShadowAtLocation { get; private set; } = 0f;
+        public GameObject CurrentModel { get; set; } = null;
 
-        StateTransition seedToGrowing = new StateTransition
-            ((originObject, originState)
-            =>
-            {
-                if (!(originState as TestPlantSeedState).WillGrow) return StateTransitionResult.NO_ACTION;
-                return StateTransitionResult.STACK_SWAP;
-            });
-        seedToGrowing.TargetState = growingState;
-        seedState.Transitions.Add(seedToGrowing);
-
-        StateTransition growingToGrown = new StateTransition
-            ((originObject, originState)
-            =>
-            {
-                if (!(originState as TestPlantGrowingState).HasReachedTarget()) return StateTransitionResult.NO_ACTION;
-                return StateTransitionResult.STACK_SWAP;
-            });
-        growingToGrown.TargetState = fullyGrownState;
-        growingState.Transitions.Add(growingToGrown);
-
-        StateTransition toDormant = new StateTransition
-            ((originObject, originState)
-            =>
-            {
-                if (SeasonChanger.Instance.GetSeason() == Season.Autumn) return StateTransitionResult.NO_ACTION;
-                return StateTransitionResult.STACK_PUSH;
-            });
-        toDormant.TargetState = dormantState;
-        growingState.Transitions.Add(toDormant);
-        fullyGrownState.Transitions.Add(toDormant);
-        seedState.Transitions.Add(toDormant);
-
-        StateTransition leaveDormancy = new StateTransition
-            ((originObject, originState)
-            =>
-            {
-                if (SeasonChanger.Instance.GetSeason() != Season.Autumn) return StateTransitionResult.NO_ACTION;
-                return StateTransitionResult.STACK_POP;
-            });
-        leaveDormancy.TargetState = null;
-        dormantState.Transitions.Add(leaveDormancy);
-
-
-        _stateMachine = new StateMachine(TestPlant, seedState);
+        private StateMachine _stateMachine = null;
     }
 
-    public TestPlantLeaf(Vector3 position, float dailySeedGrowthChance, uint averageSeedSurvivalDays, uint maxSeedSurvivalVariation, TestPlant TestPlant, bool firstLeaf)
-        : this(position, dailySeedGrowthChance, averageSeedSurvivalDays, maxSeedSurvivalVariation, TestPlant, TestPlant.gameObject.GetComponent<Plant>().ShadowFactor, firstLeaf)
-    {}
-
-    public void Update()
-    {
-        _stateMachine.Update();
-    }
-
-    public Vector3 Position { get; private set; } = Vector3.zero;
-    public float ShadowAtLocation { get; private set; } = 0f;
-    public GameObject CurrentModel { get; set; } = null;
-
-    private StateMachine _stateMachine = null;
-}
-
-namespace VegetationStates
-{
     public class TestPlantSeedState : State
     {
         public bool WillGrow { get; private set; } = false;
@@ -189,7 +189,7 @@ namespace VegetationStates
                         return;
                     }
                     hit.OnAttemptDestroy(dir);
-                }                
+                }
                 if (!plant.VegetationSys.AttemptOccupy(origin.transform.position, plant))
                 {
                     originPlant.DeregisterLeaf(_leaf, false);

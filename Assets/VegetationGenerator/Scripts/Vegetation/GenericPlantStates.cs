@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VegetationStates
+namespace VegetationGenerator
 {
     public class GenericSeedState : State
     {

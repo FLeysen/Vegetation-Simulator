@@ -3711,6 +3711,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfb0ad5d02cb51a4b837a5d4a27d20c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _allowReset: 1
+  _resetButton: 114
+  _resetHoldTime: 3
   _possiblePlantPrefabs:
   - {fileID: 2215387684197432118, guid: 4a2d7f4b297fde545ad8108844a180ea, type: 3}
   - {fileID: 2215387684197432118, guid: ab3f09363f94e6b4d9d0e7923d6c34a4, type: 3}
