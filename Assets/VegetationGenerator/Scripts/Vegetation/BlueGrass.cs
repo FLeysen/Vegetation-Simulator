@@ -1,6 +1,5 @@
-﻿using UnityEngine;
-using VegetationStates;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace VegetationGenerator
 {
