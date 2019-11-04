@@ -1,0 +1,27 @@
+Student Name:	Floris Leysen
+Coach:	Jorge Monterrubio Sanudo
+Mentor:	Steven Verborgh
+
+==== JOURNAL ====
+Monday:
+Continuing on the paper, after finding the way I wanted to express my findings, I finished the optimization segment. The rest of the day was spent on building and completing the extra types of plants (completing blue and green, but not the plant-eating one yet) and investigating how they interact in multiple simulations, recording everything from different angles to look back on the process in a cleaner manner. I scoured through the results contemplating problem areas, as well as possible changes. 
+
+Tuesday:
+Predator plant was created. This entire day was dedicated to creating, debugging, simulating and everything related to this new, completely different type of plant. Again, the same process of recording and analysing was used. This plant has a special mesh specifically created to allow usage of the clipping in an unusual manner (128 vertices divided in four fragments that represent different stages of the plant's growth). Apparently, Unity will often add some vertices when importing meshes, which lead to trial-and-error testing of which exact vertex layout and count made it precisely as it needed to be.
+
+Wednesday:
+This day was mostly dedicated to simulating often with various parameters, again with recording and analysis. I could now start creating the paper segment of the varying plant types. I still needed to decide which result to use but could already write the general intro section which introduces the plant types and the ideas.
+
+Thursday:
+Figured out which results to use. Reran simulations of their parameters to get a clean visual result of what to show in the paper. By the end of this day, the different plant types segment of the paper was completely finished, with expansive visualizations and added explanations.
+
+Friday:
+With the research, case study (and paper almost) done, it was time to start the endgame. I first finished up the paper, writing an abstract and a conclusion to my findings, then started polishing the paper, rewriting segments to better fit intent, rewording parts etc. The weekly report was also written this day. 
+
+Still to do before presentation day:
+Revise some presentation elements (and add conclusion). Decide on video to use (already gathered many this week). Rehearse, rehearse, rehearse presentation. Possibly: go over paper again to confirm satisfaction.
+
+==== NOTES MEETING ====
+No meeting this week.
+
+==== REFLECTION ====
