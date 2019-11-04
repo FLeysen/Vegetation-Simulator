@@ -2,7 +2,6 @@
 
 namespace VegetationGenerator
 {
-
     public class AutomaticTimePassage : MonoBehaviour
     {
         [SerializeField] private KeyCode _pauseButton = KeyCode.Space;
