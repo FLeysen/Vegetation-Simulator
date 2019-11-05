@@ -57,9 +57,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0dd027089a26e5a4a9b174646c245f92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _dailySeedGrowthChance: 0.05
-  _averageSeedSurvivalDays: 10
-  _maxSeedSurvivalVariation: 5
+  _dailySeedGrowthChance: 0.01
+  _averageSeedSurvivalDays: 37
+  _maxSeedSurvivalVariation: 14
   _leafModel: {fileID: 5236946484475734406, guid: 286efea47e945f34290cc4bdb5957044,
     type: 3}
 --- !u!1 &2215387684197432118
