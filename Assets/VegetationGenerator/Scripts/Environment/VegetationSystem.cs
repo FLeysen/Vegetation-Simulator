@@ -15,14 +15,10 @@ namespace VegetationGenerator
         private Dictionary<Vector3Int, Plant> _gridOccupations = new Dictionary<Vector3Int, Plant>();
         private DetectSurfaces _surfaceDetector = null;
         private float _resetHoldDuration = 0f;
+        private bool _wasInit = false;
 
         private int _plantPrefabLength = 0;
         private int _seedArrayLength = 0;
-
-        private void Start()
-        {
-            Invoke("SpawnVegetation", 0.12f);
-        }
 
         private void Update()
         {
@@ -36,6 +32,15 @@ namespace VegetationGenerator
             {
                 ResetVegetation();
                 _resetHoldDuration = 0f;
+            }
+        }
+
+        private void LateUpdate()
+        {
+            if (!_wasInit)
+            {
+                _wasInit = true;
+                SpawnVegetation();
             }
         }
 
